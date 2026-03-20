@@ -13,7 +13,10 @@ aio_pika
 aiosqlite
 SQLAlchemy
 websockets
+python-jose
 fastapi[all]
 pydantic[all]
 python-dotenv
+bcrypt==4.0.1
+passlib[bcrypt]
 python-multipart

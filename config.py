@@ -27,5 +27,12 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     REDIS_PASSWORD: str
 
+    SECRET_KEY: str
+    ALGORITHM: str
+
 
 settings = Settings()
+
+
+def get_auth_data():
+    return {'secret_key': settings.SECRET_KEY, 'algorithm': settings.ALGORITHM}

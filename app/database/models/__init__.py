@@ -1,1 +1,1 @@
-from .example import Test
+from .user import User

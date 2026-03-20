@@ -36,4 +36,5 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.state.limiter = limiter
 
 
-app.include_router(example_router)
+app.include_router(auth_router)
+app.include_router(user_router)
