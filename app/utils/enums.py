@@ -1,7 +1,11 @@
 from enum import Enum
 
 
-class RoleEnum(Enum):
-    admin = 'admin'
-    psychologist = 'psychologist'
-    user = 'user'
+class SourceEnum(Enum):
+    ria = 'ria'
+    lenta = 'lenta'
+    tass = 'tass'
+    kommersant = 'kommersant'
+    vedomosti = 'vedomosti'
+    habr = 'habr'
+    cnews = 'cnews'

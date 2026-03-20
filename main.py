@@ -6,11 +6,20 @@ from app.database.base import async_main
 from app.database.redis import redis_service
 
 import aiohttp
+import logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from fastapi.middleware.cors import CORSMiddleware
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -36,5 +45,5 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.state.limiter = limiter
 
 
-app.include_router(auth_router)
-app.include_router(user_router)
+app.include_router(news_router)
+app.include_router(chat_router)

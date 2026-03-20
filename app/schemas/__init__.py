@@ -1,2 +1,3 @@
 from .base import *
-from .user import *
+from .news import *
+from .chat import *

@@ -10,13 +10,13 @@ uvicorn
 aiohttp
 gunicorn
 aio_pika
+mistralai
 aiosqlite
+feedparser
 SQLAlchemy
 websockets
-python-jose
+transformers
 fastapi[all]
 pydantic[all]
 python-dotenv
-bcrypt==4.0.1
-passlib[bcrypt]
 python-multipart
