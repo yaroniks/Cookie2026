@@ -1,0 +1,13 @@
+motor
+beanie
+alembic
+asyncpg
+slowapi
+aio_pika
+starlette
+aiosqlite
+SQLAlchemy
+websockets
+python-dotenv
+python-multipart
+pydantic-settings

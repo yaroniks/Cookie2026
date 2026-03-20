@@ -1,0 +1,14 @@
+redis
+motor
+beanie
+asyncpg
+slowapi
+aiohttp
+aio_pika
+aiosqlite
+SQLAlchemy
+websockets
+fastapi[all]
+pydantic[all]
+python-dotenv
+python-multipart
