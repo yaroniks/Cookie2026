@@ -36,7 +36,7 @@ async def news_main(request: Request):
 
     number = await MistralChat.get_response(f'ДАН СПИСОК НОВОСТЕЙ ТЫ ДОЛЖЕН ОТВЕТИТЬ ИНДЕКСОМ САМОЙ ИНТЕРЕСНОЙ НОВОСТИ, '
                                             f'ОДНИМ ЛИШЬ ЧИСЛОМ (ИНДЕКСОМ, НАЧИНАЕТСЯ С 0), НИЧЕГО ЛИШНЕГО В ОТВЕТЕ '
-                                            f'КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\nСПИСОК НОВОСТЕЙ: {select_feeds[:500]}')
+                                            f'КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\nСПИСОК НОВОСТЕЙ: {select_feeds[:300]}')
     if number.isdigit():
         try:
             result = valid_feeds[int(number)]
