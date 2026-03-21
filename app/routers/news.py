@@ -27,11 +27,11 @@ async def get_news(request: Request):
 @limiter.limit('60/minute')
 async def news_main(request: Request):
     feeds = await fetch_feeds(request.app.state.session)
+    valid_feeds = []
     select_feeds = []
     for feed in feeds:
-        if not feed.get('title') or not feed.get('description') or not feed.get('image'):
-            feeds.remove(feed)
-        else:
+        if feed.get('title') and feed.get('description') and feed.get('image'):
+            valid_feeds.append(feed)
             select_feeds.append({'name': feed.get('title'), 'desc': feed.get('description')})
 
     number = await MistralChat.get_response(f'ДАН СПИСОК НОВОСТЕЙ ТЫ ДОЛЖЕН ОТВЕТИТЬ ИНДЕКСОМ САМОЙ ИНТЕРЕСНОЙ НОВОСТИ, '
@@ -39,11 +39,11 @@ async def news_main(request: Request):
                                             f'КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\nСПИСОК НОВОСТЕЙ: {select_feeds[:500]}')
     if number.isdigit():
         try:
-            result = feeds[int(number)]
+            result = valid_feeds[int(number)]
         except:
-            result = feeds[0]
+            result = valid_feeds[0]
     else:
-        result = feeds[0]
+        result = valid_feeds[0]
     text = f"{result.get('title', '')} {result.get('description', '')} {result.get('category', '')}"
     result["entities"] = await ner_service.extract_entities(text)
     return result
