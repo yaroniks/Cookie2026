@@ -19,7 +19,7 @@ export const sendMessageStream = async (
   });
 
   if (!response.ok || !response.body) {
-    throw new Error('Failed to connect to stream');
+    throw new Error('Ошибка установления стрим-запроса');
   }
 
   const reader = response.body.getReader();
