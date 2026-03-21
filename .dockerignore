@@ -1,6 +1,7 @@
 .git/
 .idea/
 .venv/
+.cache/
 
 .dockerignore
 docker-compose.yml

@@ -2,7 +2,7 @@ name: "FastApi"
 
 services:
   postgresql:
-    image: postgres:15
+    image: pgvector/pgvector:pg16
     container_name: postgresql
     restart: always
     env_file:
@@ -39,42 +39,24 @@ services:
       timeout: 5s
       retries: 3
 
-#  rabbitmq:
-#    image: rabbitmq:4-management
-#    container_name: rabbitmq
-#    restart: always
-#    env_file:
-#      - .env
-#    environment:
-#      RABBITMQ_DEFAULT_USER: ${RABITMQ_USERNAME}
-#      RABBITMQ_DEFAULT_PASS: ${RABITMQ_PASSWORD}
-#    volumes:
-#      - ./rabbitmq_data:/var/lib/rabbitmq
-#    networks:
-#      - app
-#    healthcheck:
-#      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-
-#  mongodb:
-#    image: mongo
-#    container_name: mongodb
-#    env_file:
-#      - .env
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
-#      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
-#    ports:
-#      - ${MONGODB_PORT}
-#    networks:
-#      - app
-#    healthcheck:
-#      test: [ "CMD-SHELL", "mongosh --username $$MONGO_INITDB_ROOT_USERNAME --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")' | grep -q ok" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j
+    restart: always
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}  # имя всегда neo4j
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    networks:
+      - app
+    healthcheck:
+      test: [ "CMD", "cypher-shell", "-u", "${NEO4J_USER}", "-p", "${NEO4J_PASSWORD}", "RETURN 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s  # neo4j долго стартует
 
   alembic:
     build: ./migration
@@ -92,20 +74,6 @@ services:
         condition: service_healthy
     command: alembic upgrade head
 
-#  rabbitmq_worker:
-#    build: ./workers/rabbitmq
-#    container_name: rabbitmq_worker
-#    restart: always
-#    volumes:
-#      - ./app/:/app/app
-#      - ./config.py:/app/config.py
-#      - ./.env:/app/.env
-#    networks:
-#      - app
-#    depends_on:
-#      rabbitmq:
-#        condition: service_healthy
-
   main:
     build: .
     container_name: fastapi
@@ -114,19 +82,17 @@ services:
       - 8000:8000
     networks:
       - app
+    volumes:
+      - ./.cache/huggingface:/root/.cache/huggingface
     depends_on:
       postgresql:
         condition: service_healthy
-#      rabbitmq:
-#        condition: service_healthy
       redis:
         condition: service_healthy
-#      mongodb:
-#        condition: service_healthy
 
-#volumes:
+volumes:
+  hf_cache:
 #  postgres_data:
-#  rabbitmq_data:
 
 networks:
   app:

@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     REDIS_PASSWORD: str
 
+    NEO4J_USER: str
+    NEO4J_PASSWORD: str
+    NEO4J_URI: str
+
     MISTRAL_API: str
 
 
@@ -35,9 +39,9 @@ settings = Settings()
 RSS_FEEDS = {
     "ria": "https://ria.ru/export/rss2/archive/index.xml",
     "lenta": "https://lenta.ru/rss/news",
-    "tass": "https://tass.ru/rss/v2.xml",
-    "kommersant": "https://www.kommersant.ru/RSS/news.xml",
-    "vedomosti": "https://www.vedomosti.ru/rss/news",
-    "habr": "https://habr.com/ru/rss/news/",
-    "cnews": "https://www.cnews.ru/inc/rss/news.xml",
+    # "tass": "https://tass.ru/rss/v2.xml",
+    # "kommersant": "https://www.kommersant.ru/RSS/news.xml",
+    # "vedomosti": "https://www.vedomosti.ru/rss/news",
+    # "habr": "https://habr.com/ru/rss/news/",
+    # "cnews": "https://www.cnews.ru/inc/rss/news.xml",
 }

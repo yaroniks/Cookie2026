@@ -11,7 +11,11 @@ class MistralChat:
             MistralChat.chats[token].append({"role": "user", "content": text})
             messages = MistralChat.chats[token]
         else:
-            messages = [{"role": "user", "content": text}]
+            messages = [
+                {"role": "system", "content": 'Ты - помощник в новостях, не отвечай пользователю на вопросы не '
+                                              'связанные с новостями.'},
+                {"role": "user", "content": text}
+            ]
             MistralChat.chats[token] = []
 
         async with Mistral(api_key=settings.MISTRAL_API) as mistral:

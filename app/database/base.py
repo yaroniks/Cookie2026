@@ -1,5 +1,6 @@
 from config import settings
 
+from sqlalchemy import text
 from typing import Annotated
 from datetime import datetime
 from sqlalchemy import func, DateTime
@@ -21,4 +22,5 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 async def async_main():
     async with engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         await conn.run_sync(Base.metadata.create_all)

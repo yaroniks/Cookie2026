@@ -1,13 +1,17 @@
+spacy
 redis
 motor
 httpx
+neo4j
 pytest
 beanie
+hdbscan
 asyncpg
 alembic
 slowapi
 uvicorn
 aiohttp
+pgvector
 gunicorn
 aio_pika
 mistralai
@@ -20,3 +24,4 @@ fastapi[all]
 pydantic[all]
 python-dotenv
 python-multipart
+sentence-transformers
