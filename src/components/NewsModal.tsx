@@ -68,12 +68,12 @@ const NewsModal: React.FC<NewsModalProps> = ({ isOpen, onClose, article }) => {
         className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/5 hover:bg-black/10 rounded-full z-10">
+        <button onClick={onClose} className="absolute z-10 p-2 rounded-full top-4 right-4 bg-black/5 hover:bg-black/10">
           <X className="w-5 h-5 text-gray-700" />
         </button>
 
-        <div className="overflow-y-auto p-6 sm:p-8">
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-4 font-medium">
+        <div className="p-6 overflow-y-auto sm:p-8">
+          <div className="flex items-center gap-4 mb-4 text-sm font-medium text-gray-500">
             <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
               <Globe className="w-4 h-4" />
               {article.source || 'SparkNews'}
@@ -84,19 +84,19 @@ const NewsModal: React.FC<NewsModalProps> = ({ isOpen, onClose, article }) => {
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-6">{article.title}</h2>
+          <h2 className="mb-6 text-2xl font-extrabold text-gray-900 sm:text-3xl">{article.title}</h2>
 
           {article.imageUrl && (
-            <div className="mb-6 rounded-xl overflow-hidden border border-gray-200">
-              <img src={article.imageUrl} alt="" className="w-full max-h-100 object-cover" />
+            <div className="mb-6 overflow-hidden border border-gray-200 rounded-xl">
+              <img src={article.imageUrl} alt="" className="object-cover w-full max-h-100" />
             </div>
           )}
 
-          <div className="text-gray-700 text-lg leading-relaxed mb-8">{article.excerpt}</div>
+          <div className="mb-8 text-lg leading-relaxed text-gray-700">{article.excerpt}</div>
 
           {article.entities && article.entities.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 mb-4">
+            <div className="pt-6 mt-8 border-t border-gray-200">
+              <h3 className="flex items-center gap-2 mb-4 text-lg font-bold text-gray-900">
                 <Tag className="w-5 h-5 text-[#3366CC]" /> Сущности:
               </h3>
               <div className="flex flex-wrap gap-2">

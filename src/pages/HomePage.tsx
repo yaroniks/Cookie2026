@@ -63,9 +63,9 @@ const HomePage: React.FC = () => {
   return (
     <div className="bg-[#a5bef4] min-h-screen py-10 px-4">
       <NewsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} article={selectedNews} />
-      <main className="max-w-7xl mx-auto">
+      <main className="mx-auto max-w-7xl">
         {isLoading ? (
-          <div className="flex justify-center items-center h-64 text-white text-2xl font-black animate-pulse">
+          <div className="flex items-center justify-center h-64 text-2xl font-black text-white animate-pulse">
             ЗАГРУЖАЕМ НОВОСТИ...
           </div>
         ) : (
