@@ -16,6 +16,7 @@ const HomePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   
   const query = searchParams.get('search');
+  const categoryParam = searchParams.get('category');
 
   useEffect(() => {
     const loadData = async () => {
@@ -29,6 +30,10 @@ const HomePage: React.FC = () => {
           data = await fetchNews();
         }
         
+        if (categoryParam) {
+          data = data.filter(item => item.category === categoryParam);
+        }
+
         const grouped = groupNewsByCategory(data);
         setClusters(grouped);
       } catch (err) {
@@ -40,16 +45,18 @@ const HomePage: React.FC = () => {
     };
 
     loadData();
-  }, [query]);
+  }, [query, categoryParam]);
 
   return (
     <div className="bg-[#a5bef4] min-h-screen py-10 px-4 sm:px-6">
       <main className="max-w-7xl mx-auto">
         
-        {query && (
-          <div className="mb-8 flex items-center justify-between">
+        {(query || categoryParam) && (
+          <div className="mb-8 flex flex-wrap gap-2 items-center">
             <h2 className="text-white text-xl font-bold">
-              Результаты поиска: <span className="text-[#003289]">«{query}»</span>
+              {query && <>Результаты поиска: <span className="text-[#003289]">«{query}»</span></>}
+              {query && categoryParam && <span className="mx-2">|</span>}
+              {categoryParam && <>Категория: <span className="text-[#003289]">{categoryParam}</span></>}
             </h2>
           </div>
         )}
@@ -63,7 +70,7 @@ const HomePage: React.FC = () => {
         ) : clusters.length > 0 ? (
           clusters.map((cluster) => (
             <NewsCluster 
-              key={cluster.id} 
+              key={cluster.category}
               category={cluster.category} 
               news={cluster.news.map((n, idx) => ({
                 id: n.id || idx, 
