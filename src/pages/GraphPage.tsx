@@ -154,7 +154,7 @@ const GraphPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-full bg-[#0f172a] flex items-center justify-center font-mono text-blue-400">
-        <span className="animate-pulse">LOADING_DATA...</span>
+        <span className="animate-pulse">Загрузка...</span>
       </div>
     );
   }

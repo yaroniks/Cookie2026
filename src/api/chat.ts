@@ -10,7 +10,7 @@ export const sendMessageStream = async (
 ) => {
   const token = getOrCreateToken();
 
-  const response = await fetch('http://localhost:8000/api/v1/chat/send_message', {
+  const response = await fetch('https://spark-news.ru/api/v1/chat/send_message', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

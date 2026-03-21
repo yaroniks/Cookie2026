@@ -23,7 +23,7 @@ interface GraphViewProps {
   highlightLinks: Set<Link>;
   selectedNodes: Set<string>;
   onNodeClick: (node: Node) => void;
-  onBackgroundClick: () => void; // Новый проп
+  onBackgroundClick: () => void;
   typeColors: Record<string, string>;
 }
 
@@ -78,7 +78,7 @@ const GraphView: React.FC<GraphViewProps> = ({
         }}
         linkWidth={(linkObj) => highlightLinks.has(linkObj as Link) ? 2 : 1}
         onNodeClick={(node) => onNodeClick(node as Node)}
-        onBackgroundClick={onBackgroundClick} // Обработка клика в пустоту
+        onBackgroundClick={onBackgroundClick}
         backgroundColor="#0f172a"
       />
     </div>
