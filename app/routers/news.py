@@ -44,7 +44,8 @@ async def news_main(request: Request):
             result = feeds[0]
     else:
         result = feeds[0]
-
+    text = f"{result.get('title', '')} {result.get('description', '')} {result.get('category', '')}"
+    result["entities"] = await ner_service.extract_entities(text)
     return result
 
 
