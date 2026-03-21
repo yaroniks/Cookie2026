@@ -23,6 +23,7 @@ interface GraphViewProps {
   highlightLinks: Set<Link>;
   selectedNodes: Set<string>;
   onNodeClick: (node: Node) => void;
+  onBackgroundClick: () => void; // Новый проп
   typeColors: Record<string, string>;
 }
 
@@ -31,7 +32,8 @@ const GraphView: React.FC<GraphViewProps> = ({
   highlightNodes, 
   highlightLinks, 
   selectedNodes, 
-  onNodeClick, 
+  onNodeClick,
+  onBackgroundClick,
   typeColors 
 }) => {
   return (
@@ -40,7 +42,6 @@ const GraphView: React.FC<GraphViewProps> = ({
         graphData={data}
         nodeLabel="name"
         nodeCanvasObject={(obj, ctx, globalScale) => {
-
           const node = obj as Node & { x: number; y: number };
           const label = node.name;
           const fontSize = 12 / globalScale;
@@ -51,7 +52,6 @@ const GraphView: React.FC<GraphViewProps> = ({
           const alpha = isHighlighted ? 1 : 0.05;
 
           if (node.x !== undefined && node.y !== undefined) {
-
             ctx.beginPath();
             ctx.arc(node.x, node.y, node.val / 2, 0, 2 * Math.PI, false);
             ctx.fillStyle = isSelected ? '#fff' : (typeColors[node.type] || '#fff');
@@ -78,6 +78,7 @@ const GraphView: React.FC<GraphViewProps> = ({
         }}
         linkWidth={(linkObj) => highlightLinks.has(linkObj as Link) ? 2 : 1}
         onNodeClick={(node) => onNodeClick(node as Node)}
+        onBackgroundClick={onBackgroundClick} // Обработка клика в пустоту
         backgroundColor="#0f172a"
       />
     </div>

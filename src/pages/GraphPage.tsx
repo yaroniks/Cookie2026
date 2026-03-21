@@ -43,6 +43,24 @@ const GraphPage: React.FC = () => {
   const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
   const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(new Set());
 
+  // Сброс всех выделений
+  const resetSelection = useCallback(() => {
+    setSelectedNodes(new Set());
+    setHighlightNodes(new Set());
+    setHighlightLinks(new Set());
+  }, []);
+
+  // Обработка клавиши ESC
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        resetSelection();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [resetSelection]);
+
   const getHighlightData = useCallback((targetNode: Node, allLinks: Link[]) => {
     const hNodes = new Set<string>();
     const hLinks = new Set<Link>();
@@ -128,6 +146,7 @@ const GraphPage: React.FC = () => {
   }, [getHighlightData, graphData.links]);
 
   const handleSearch = () => {
+    if (selectedNodes.size === 0) return;
     const query = Array.from(selectedNodes).join(' ');
     navigate(`/?search=${encodeURIComponent(query)}`);
   };
@@ -135,7 +154,7 @@ const GraphPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-full bg-[#0f172a] flex items-center justify-center font-mono text-blue-400">
-        <span className="animate-pulse">Загрузка...</span>
+        <span className="animate-pulse">LOADING_DATA...</span>
       </div>
     );
   }
@@ -154,6 +173,7 @@ const GraphPage: React.FC = () => {
         highlightLinks={highlightLinks}
         selectedNodes={selectedNodes}
         onNodeClick={handleNodeClick}
+        onBackgroundClick={resetSelection}
         typeColors={typeColors}
       />
     </div>
