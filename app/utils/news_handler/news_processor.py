@@ -30,7 +30,7 @@ async def process_and_save(raw_articles: list[dict]) -> dict:
         return {"total": 0, "inserted_pg": 0, "neo4j": "skipped"}
 
     logger.info(f"process_and_save: получено {len(raw_articles)} статей")
-
+    raw_articles = raw_articles[:500]
     # Шаг 1: кластеризация — добавляет cluster_id и embedding в каждую статью
     clustered = clustering_service.cluster_articles(raw_articles)
     logger.info("process_and_save: кластеризация завершена")
