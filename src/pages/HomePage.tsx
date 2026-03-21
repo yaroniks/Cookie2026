@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import NewsCluster from '../components/NewsCluster';
+import NewsCluster, { type SimpleNewsItem } from '../components/NewsCluster';
 import { fetchNews, searchNews, type NewsItem } from '../api/news';
 import { groupNewsByCategory } from '../utils/newsUtils';
+import NewsModal from '../components/NewsModal';
+import type { NewsDetail, Entity } from '../components/NewsModal';
 
 interface ClusterData {
-  id: number;
   category: string;
   news: NewsItem[];
 }
@@ -15,6 +16,9 @@ const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<NewsDetail | null>(null);
+  
   const query = searchParams.get('search');
   const categoryParam = searchParams.get('category');
 
@@ -22,70 +26,62 @@ const HomePage: React.FC = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        let data: NewsItem[];
-        
-        if (query) {
-          data = await searchNews(query);
-        } else {
-          data = await fetchNews();
-        }
-        
+        let data: NewsItem[] = query ? await searchNews(query) : await fetchNews();
         if (categoryParam) {
           data = data.filter(item => item.category === categoryParam);
         }
-
-        const grouped = groupNewsByCategory(data);
-        setClusters(grouped);
+        setClusters(groupNewsByCategory(data) as unknown as ClusterData[]);
       } catch (err) {
-        console.error("Ошибка при получении данных:", err);
+        console.error(err);
         setClusters([]);
       } finally {
         setIsLoading(false);
       }
     };
-
     loadData();
   }, [query, categoryParam]);
 
-  return (
-    <div className="bg-[#a5bef4] min-h-screen py-10 px-4 sm:px-6">
-      <main className="max-w-7xl mx-auto">
-        
-        {(query || categoryParam) && (
-          <div className="mb-8 flex flex-wrap gap-2 items-center">
-            <h2 className="text-white text-xl font-bold">
-              {query && <>Результаты поиска: <span className="text-[#003289]">«{query}»</span></>}
-              {query && categoryParam && <span className="mx-2">|</span>}
-              {categoryParam && <>Категория: <span className="text-[#003289]">{categoryParam}</span></>}
-            </h2>
-          </div>
-        )}
+  const handleOpenNews = (newsItem: SimpleNewsItem) => {
+    const mockEntities: Entity[] = [
+      { name: 'Илон Маск', type: 'person' },
+      { name: 'Уфа', type: 'location' },
+      { name: 'SpaceX', type: 'organization' },
+      { name: 'Событие дня', type: 'event' }
+    ];
 
+    setSelectedNews({
+      title: newsItem.title,
+      excerpt: newsItem.excerpt,
+      time: newsItem.time,
+      imageUrl: newsItem.imageUrl,
+      source: 'SparkNews',
+      entities: mockEntities.sort(() => 0.5 - Math.random()).slice(0, 3)
+    });
+    setIsModalOpen(true);
+  };
+
+  return (
+    <div className="bg-[#a5bef4] min-h-screen py-10 px-4">
+      <NewsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} article={selectedNews} />
+      <main className="max-w-7xl mx-auto">
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="text-white text-2xl font-black animate-pulse uppercase tracking-tighter">
-              Загружаем новости...
-            </div>
+          <div className="flex justify-center items-center h-64 text-white text-2xl font-black animate-pulse">
+            ЗАГРУЖАЕМ НОВОСТИ...
           </div>
-        ) : clusters.length > 0 ? (
+        ) : (
           clusters.map((cluster) => (
             <NewsCluster 
               key={cluster.category}
               category={cluster.category} 
-              news={cluster.news.map((n, idx) => ({
-                id: n.id || idx, 
+              news={cluster.news.map(n => ({
                 title: n.title,
                 excerpt: n.description || "", 
                 time: n.date,
                 imageUrl: n.image || undefined 
               }))} 
+              onNewsClick={handleOpenNews}
             />
           ))
-        ) : (
-          <div className="text-center bg-white/20 backdrop-blur-md rounded-3xl p-16 border border-white/30 shadow-xl max-w-2xl mx-auto mt-10">
-            <h3 className="text-white text-3xl font-black mb-4">ПУСТО</h3>
-            <p className="text-white/80 text-lg">По вашему запросу ничего не найдено.</p>
-          </div>
         )}
       </main>
     </div>
