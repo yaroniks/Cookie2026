@@ -35,15 +35,15 @@ async def news_main(request: Request):
             select_feeds.append({'name': feed.get('title'), 'desc': feed.get('description')})
 
     number = await MistralChat.get_response(f'ДАН СПИСОК НОВОСТЕЙ ТЫ ДОЛЖЕН ОТВЕТИТЬ ИНДЕКСОМ САМОЙ ИНТЕРЕСНОЙ НОВОСТИ, '
-                                            f'ОДНИМ ЛИШЬ ЧИСЛОМ, НИЧЕГО ЛИШНЕГО В ОТВЕТЕ КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\n'
-                                            f'СПИСОК НОВОСТЕЙ: {select_feeds[:500]}')
+                                            f'ОДНИМ ЛИШЬ ЧИСЛОМ (ИНДЕКСОМ, НАЧИНАЕТСЯ С 0), НИЧЕГО ЛИШНЕГО В ОТВЕТЕ '
+                                            f'КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\nСПИСОК НОВОСТЕЙ: {select_feeds[:500]}')
     if number.isdigit():
         try:
-            result = select_feeds[int(number)]
+            result = feeds[int(number)]
         except:
-            result = select_feeds[0]
+            result = feeds[0]
     else:
-        result = select_feeds[0]
+        result = feeds[0]
     text = f"{result.get('title', '')} {result.get('description', '')} {result.get('category', '')}"
     result["entities"] = await ner_service.extract_entities(text)
     return result
