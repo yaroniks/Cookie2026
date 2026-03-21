@@ -1,7 +1,6 @@
 from app import limiter
 from app.routers import *
 from config import settings
-from app.utils import rabbitmq_service
 from app.database.base import async_main
 from app.database.redis import redis_service
 from app.utils.scheduler import start_scheduler, stop_scheduler
