@@ -14,11 +14,11 @@ router = APIRouter(prefix='/news', tags=['News'])
             responses={429: {'model': schemas.ErrorMessage}})
 @limiter.limit('60/minute')
 async def get_news(request: Request):
-    feeds = await fetch_feeds(request.app.state.session)[:300]
-    for feed in feeds:
+    feeds = await fetch_feeds(request.app.state.session)
+    for feed in feeds[:300]:
         text = f"{feed.get('title', '')} {feed.get('description', '')} {feed.get('category', '')}"
-        feed["entities"] = ner_service.extract_entities(text)
-    return feeds
+        feed["entities"] = await ner_service.extract_entities(text)
+    return feeds[:300]
 
 
 @router.post('/search/{name}', summary='Новости по запросу', response_model=list[schemas.NewsItem],
@@ -40,7 +40,7 @@ async def search_news(request: Request, name: str):
             "date": a.date,
             "image": a.image,
             "category": a.category,
-            "entities": ner_service.extract_entities(text)
+            "entities": await ner_service.extract_entities(text)
         })
 
     return results

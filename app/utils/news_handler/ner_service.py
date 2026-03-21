@@ -1,11 +1,12 @@
 import spacy
+from app.database.redis import redis_service
 
 
 class NERService:
     def __init__(self):
         self.nlp = spacy.load("ru_core_news_md")
 
-    def extract_entities(self, text: str) -> list[dict]:
+    async def extract_entities(self, text: str) -> list[dict]:
         """
         Пример работы:
         text = Владимир Путин встретился с главой Газпрома в Москве
@@ -16,6 +17,8 @@ class NERService:
             }, ...
         ]
         """
+        if await redis_service.get(text.replace(' ', '_')):
+            return await redis_service.get(text.replace(' ', '_'))
 
         if not text:
             return []
@@ -39,6 +42,7 @@ class NERService:
                 "label": ent.label_,
             })
 
+        await redis_service.set(text.replace(' ', '_'), entities)
         return entities
 
 

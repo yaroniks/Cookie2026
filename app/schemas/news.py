@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 
 class Entity(BaseModel):
-    text: str
+    text: Optional[str]
     label: EntityEnum
 
 
