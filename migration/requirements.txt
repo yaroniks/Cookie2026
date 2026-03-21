@@ -3,6 +3,7 @@ beanie
 alembic
 asyncpg
 slowapi
+pgvector
 aio_pika
 starlette
 aiosqlite

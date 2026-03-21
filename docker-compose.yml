@@ -58,21 +58,21 @@ services:
       retries: 5
       start_period: 30s  # neo4j долго стартует
 
-  alembic:
-    build: ./migration
-    restart: on-failure
-    networks:
-      - app
-    volumes:
-      - ./app/:/app/app
-      - ./.env:/app/.env
-      - ./config.py:/app/config.py
-      - ./migration/:/app/migration
-      - ./alembic.ini/:/app/alembic.ini
-    depends_on:
-      postgresql:
-        condition: service_healthy
-    command: alembic upgrade head
+#  alembic:
+#    build: ./migration
+#    restart: on-failure
+#    networks:
+#      - app
+#    volumes:
+#      - ./app/:/app/app
+#      - ./.env:/app/.env
+#      - ./config.py:/app/config.py
+#      - ./migration/:/app/migration
+#      - ./alembic.ini/:/app/alembic.ini
+#    depends_on:
+#      postgresql:
+#        condition: service_healthy
+#    command: alembic upgrade head
 
   main:
     build: .

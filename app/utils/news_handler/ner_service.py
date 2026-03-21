@@ -3,7 +3,7 @@ import spacy
 
 class NERService:
     def __init__(self):
-        self.nlp = spacy.load("ru_core_news_sm")
+        self.nlp = spacy.load("ru_core_news_md")
 
     def extract_entities(self, text: str) -> list[dict]:
         """
