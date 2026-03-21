@@ -1,10 +1,12 @@
 import React from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 
+export type NodeType = 'person' | 'location' | 'organization' | 'event';
+
 export interface Node {
   id: string;
   name: string;
-  type: 'person' | 'location' | 'organization' | 'event';
+  type: NodeType;
   val: number;
   x?: number;
   y?: number;
@@ -38,31 +40,30 @@ const GraphView: React.FC<GraphViewProps> = ({
         graphData={data}
         nodeLabel="name"
         nodeCanvasObject={(obj, ctx, globalScale) => {
-          const node = obj as Node;
+
+          const node = obj as Node & { x: number; y: number };
           const label = node.name;
           const fontSize = 12 / globalScale;
           ctx.font = `${fontSize}px Inter, sans-serif`;
           
           const isHighlighted = highlightNodes.size === 0 || highlightNodes.has(node.id);
           const isSelected = selectedNodes.has(node.name);
-          const alpha = isHighlighted ? 1 : 0.1;
+          const alpha = isHighlighted ? 1 : 0.05;
 
           if (node.x !== undefined && node.y !== undefined) {
-            // Рисуем основной круг
+
             ctx.beginPath();
             ctx.arc(node.x, node.y, node.val / 2, 0, 2 * Math.PI, false);
             ctx.fillStyle = isSelected ? '#fff' : (typeColors[node.type] || '#fff');
             ctx.globalAlpha = alpha;
             ctx.fill();
 
-            // Обводка для выбранных
             if (isSelected) {
               ctx.strokeStyle = '#3B82F6';
               ctx.lineWidth = 2 / globalScale;
               ctx.stroke();
             }
 
-            // Текст
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;

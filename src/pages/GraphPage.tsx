@@ -1,87 +1,121 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import GraphView from '../components/graph/GraphView';
-import type { Node, Link } from '../components/graph/GraphView';
+import type { Node, Link, NodeType } from '../components/graph/GraphView';
 import GraphControls from '../components/graph/GraphControls';
+import api from '../lib/axios';
 
-const typeColors = {
+interface BackendNode {
+  id: string;
+  label: string;
+  type: string;
+}
+
+interface BackendEdge {
+  source: string;
+  target: string;
+  weight: number;
+}
+
+interface GraphResponse {
+  nodes: BackendNode[];
+  edges: BackendEdge[];
+}
+
+const typeColors: Record<string, string> = {
   person: '#60A5FA',
   location: '#34D399',
   organization: '#A78BFA',
   event: '#FBBF24'
 };
 
-const mockGraphData = {
-  nodes: [
-    { id: '1', name: 'Илон Маск', type: 'person', val: 15 },
-    { id: '2', name: 'Tesla', type: 'organization', val: 10 },
-    { id: '3', name: 'США', type: 'location', val: 12 },
-    { id: '4', name: 'SpaceX', type: 'organization', val: 10 },
-    { id: '6', name: 'Павел Дуров', type: 'person', val: 14 },
-    { id: '7', name: 'Telegram', type: 'organization', val: 11 },
-  ] as Node[],
-  links: [
-    { source: '1', target: '2' },
-    { source: '1', target: '3' },
-    { source: '1', target: '4' },
-    { source: '6', target: '7' },
-    { source: '1', target: '6' },
-  ] as Link[]
-};
+const VALID_TYPES: NodeType[] = ['person', 'location', 'organization', 'event'];
 
 const GraphPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activeName = searchParams.get('active');
 
-  // Инициализируем стейты сразу на основе параметров URL
-  const initialData = useMemo(() => {
-    const nodes = new Set<string>();
-    const links = new Set<Link>();
-    const selected = new Set<string>();
+  const [graphData, setGraphData] = useState<{ nodes: Node[]; links: Link[] }>({ nodes: [], links: [] });
+  const [isLoading, setIsLoading] = useState(true);
 
-    if (activeName) {
-      const targetNode = mockGraphData.nodes.find(n => n.name === activeName);
-      if (targetNode) {
-        nodes.add(targetNode.id);
-        selected.add(targetNode.name);
-        mockGraphData.links.forEach(link => {
-          const sId = typeof link.source === 'object' ? (link.source as Node).id : link.source;
-          const tId = typeof link.target === 'object' ? (link.target as Node).id : link.target;
-          if (sId === targetNode.id || tId === targetNode.id) {
-            links.add(link);
-            nodes.add(sId);
-            nodes.add(tId);
-          }
-        });
-      }
-    }
-    return { nodes, links, selected };
-  }, [activeName]);
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
+  const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
+  const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(new Set());
 
-  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(initialData.selected);
-  const [highlightNodes, setHighlightNodes] = useState<Set<string>>(initialData.nodes);
-  const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(initialData.links);
+  // Чистая логика расчета связей без побочных эффектов
+  const getHighlightData = useCallback((targetNode: Node, allLinks: Link[]) => {
+    const hNodes = new Set<string>();
+    const hLinks = new Set<Link>();
 
-  const handleNodeClick = useCallback((node: Node) => {
-    const newHighlightNodes = new Set<string>();
-    const newHighlightLinks = new Set<Link>();
+    hNodes.add(targetNode.id);
+    allLinks.forEach(link => {
+      const sId = typeof link.source === 'object' ? (link.source as Node).id : link.source;
+      const tId = typeof link.target === 'object' ? (link.target as Node).id : link.target;
 
-    newHighlightNodes.add(node.id);
-    
-    mockGraphData.links.forEach(link => {
-      const sourceId = typeof link.source === 'object' ? (link.source as Node).id : link.source;
-      const targetId = typeof link.target === 'object' ? (link.target as Node).id : link.target;
-
-      if (sourceId === node.id || targetId === node.id) {
-        newHighlightLinks.add(link);
-        newHighlightNodes.add(sourceId);
-        newHighlightNodes.add(targetId);
+      if (sId === targetNode.id || tId === targetNode.id) {
+        hLinks.add(link);
+        hNodes.add(sId);
+        hNodes.add(tId);
       }
     });
+    return { hNodes, hLinks };
+  }, []);
 
-    setHighlightNodes(newHighlightNodes);
-    setHighlightLinks(newHighlightLinks);
+  useEffect(() => {
+    const fetchGraph = async () => {
+      try {
+        setIsLoading(true);
+        const { data } = await api.get<GraphResponse>('/graph/co-occurrences');
+
+        const nodesMap = new Map<string, Node>();
+        data.nodes.forEach(n => {
+          if (n.id !== "None" && n.label !== "None") {
+            const rawType = n.type.toLowerCase() as NodeType;
+            const safeType = VALID_TYPES.includes(rawType) ? rawType : 'event';
+            
+            nodesMap.set(n.id, {
+              id: n.id,
+              name: n.label,
+              type: safeType,
+              val: 10
+            });
+          }
+        });
+
+        const links: Link[] = data.edges
+          .filter(e => e.source !== "None" && e.target !== "None" && nodesMap.has(e.source) && nodesMap.has(e.target))
+          .map(e => ({
+            source: e.source,
+            target: e.target
+          }));
+
+        const nodesArray = Array.from(nodesMap.values());
+        setGraphData({ nodes: nodesArray, links });
+
+        if (activeName) {
+          const target = nodesArray.find(n => n.name === activeName);
+          if (target) {
+            const { hNodes, hLinks } = getHighlightData(target, links);
+            setHighlightNodes(hNodes);
+            setHighlightLinks(hLinks);
+            setSelectedNodes(new Set([target.name]));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch graph:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGraph();
+  }, [activeName, getHighlightData]);
+
+  const handleNodeClick = useCallback((node: Node) => {
+    const { hNodes, hLinks } = getHighlightData(node, graphData.links);
+    setHighlightNodes(hNodes);
+    setHighlightLinks(hLinks);
 
     setSelectedNodes(prev => {
       const next = new Set(prev);
@@ -92,12 +126,20 @@ const GraphPage: React.FC = () => {
       }
       return next;
     });
-  }, []);
+  }, [getHighlightData, graphData.links]);
 
   const handleSearch = () => {
     const query = Array.from(selectedNodes).join(' ');
     navigate(`/?search=${encodeURIComponent(query)}`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full bg-[#0f172a] flex items-center justify-center font-mono text-blue-400">
+        <span className="animate-pulse">LOADING_DATA...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full bg-[#0f172a] overflow-hidden flex flex-col relative">
@@ -108,7 +150,7 @@ const GraphPage: React.FC = () => {
         typeColors={typeColors}
       />
       <GraphView 
-        data={mockGraphData}
+        data={graphData}
         highlightNodes={highlightNodes}
         highlightLinks={highlightLinks}
         selectedNodes={selectedNodes}
