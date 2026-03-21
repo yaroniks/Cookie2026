@@ -27,13 +27,16 @@ async def get_news(request: Request):
 @limiter.limit('60/minute')
 async def news_main(request: Request):
     feeds = await fetch_feeds(request.app.state.session)
+    select_feeds = []
     for feed in feeds:
         if not feed.get('title') or not feed.get('description') or not feed.get('image'):
             feeds.remove(feed)
+        else:
+            select_feeds.append({'name': feed.get('title'), 'desc': feed.get('description')})
 
     number = await MistralChat.get_response(f'ДАН СПИСОК НОВОСТЕЙ ТЫ ДОЛЖЕН ОТВЕТИТЬ ИНДЕКСОМ САМОЙ ИНТЕРЕСНОЙ НОВОСТИ, '
                                             f'ОДНИМ ЛИШЬ ЧИСЛОМ, НИЧЕГО ЛИШНЕГО В ОТВЕТЕ КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\n'
-                                            f'СПИСОК НОВОСТЕЙ: {feeds}')
+                                            f'СПИСОК НОВОСТЕЙ: {select_feeds[:500]}')
     if number.isdigit():
         try:
             result = feeds[int(number)]
