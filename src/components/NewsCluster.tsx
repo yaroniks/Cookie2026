@@ -17,12 +17,18 @@ const NewsCluster: React.FC<ClusterProps> = ({ category, news, onNewsClick }) =>
       <div className="p-6 bg-white sm:p-10"> 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {news.map((item, index) => {
-
             const hasImage = !!item.image;
-            const isLast = index === news.length - 1;
-            const isOdd = (index + 1) % 2 !== 0;
+
+            const isFirstInRow = (index % 2 === 0);
+            const nextItemHasNoImage = news[index + 1] && !news[index + 1].image;
+            const prevItemHasNoImage = news[index - 1] && !news[index - 1].image;
             
-            const shouldFullWidth = hasImage || (isLast && isOdd);
+            let shouldFullWidth = hasImage;
+            
+            if (!hasImage) {
+              const pairedWithNoImage = (isFirstInRow && nextItemHasNoImage) || (!isFirstInRow && prevItemHasNoImage);
+              shouldFullWidth = !pairedWithNoImage;
+            }
 
             return (
               <div 
