@@ -30,7 +30,6 @@ const HomePage: React.FC = () => {
         if (categoryParam) {
           data = data.filter(item => item.category === categoryParam);
         }
-
         const grouped = groupNewsByCategory(data) as unknown as ClusterData[];
         setClusters(grouped);
       } catch (err) {
@@ -44,7 +43,6 @@ const HomePage: React.FC = () => {
   }, [query, categoryParam]);
 
   const handleOpenNews = (newsItem: NewsItem) => {
-
     const mapType = (label: string): Entity['type'] => {
       switch (label) {
         case 'PER': return 'person';
@@ -54,10 +52,20 @@ const HomePage: React.FC = () => {
       }
     };
 
+    // фильтр ,убираем None, пустые строки и дубликаты
+    const validEntities = (newsItem.entities || []).filter(e => {
+      if (!e.text) return false;
+      const text = e.text.trim().toLowerCase();
+      return text !== '' && text !== 'none' && text !== 'null';
+    });
 
-    const uniqueEntities = Array.from(
-      new Map(newsItem.entities?.map(e => [e.text, e])).values()
-    );
+    const uniqueEntitiesMap = new Map();
+    validEntities.forEach(e => {
+      const key = e.text.trim().toLowerCase();
+      if (!uniqueEntitiesMap.has(key)) {
+        uniqueEntitiesMap.set(key, e);
+      }
+    });
 
     setSelectedNews({
       title: newsItem.title,
@@ -65,7 +73,7 @@ const HomePage: React.FC = () => {
       time: newsItem.date,
       imageUrl: newsItem.image || undefined,
       source: newsItem.source,
-      entities: uniqueEntities.map(e => ({
+      entities: Array.from(uniqueEntitiesMap.values()).map(e => ({
         name: e.text,
         type: mapType(e.label)
       }))
