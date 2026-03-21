@@ -1,3 +1,20 @@
+"""
+rss_parser.py — парсер RSS-лент.
+
+Изменения по сравнению с оригиналом:
+  Добавлена функция fetch_feeds_raw(session) — то же самое что fetch_feeds,
+  но БЕЗ декоратора @redis_service.cache.
+
+  Зачем: декоратор @cache требует передачи session как аргумента
+  и кеширует результат в Redis. В Celery это работает, НО:
+  - кеш живёт 500 сек, и задача каждые 15 мин получит старые данные
+  - в Celery лучше явно управлять кешем через invalidate_rss_cache
+
+  Используй:
+    fetch_feeds(session)     — в FastAPI роутерах (с кешем, для /news/)
+    fetch_feeds_raw(session) — в Celery задачах (без кеша, всегда свежие)
+"""
+
 import config
 from app.database.redis import redis_service
 
@@ -6,7 +23,6 @@ import aiohttp
 import feedparser
 from typing import Optional
 from datetime import datetime
-
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +52,7 @@ def extract_date(entry) -> str | None:
         if entry.get("updated"):
             return str(entry.get("updated"))
     except Exception as err:
-        logger.error(f'extract_date: {err}')
+        logger.error(f"extract_date: {err}")
         return None
 
 
@@ -48,10 +64,14 @@ def extract_description(entry) -> str | None:
     )
 
 
-@redis_service.cache(key='rss_feeds', expire=500)
-async def fetch_feeds(session: aiohttp.ClientSession) -> list[dict]:
+async def _fetch_all(session: aiohttp.ClientSession) -> list[dict]:
+    """Общая логика парсинга — без кеша."""
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        )
     }
     results = []
 
@@ -74,6 +94,23 @@ async def fetch_feeds(session: aiohttp.ClientSession) -> list[dict]:
                     })
 
         except Exception as err:
-            logger.error(f'fetch_feeds: {err}')
+            logger.error(f"fetch_feeds: ошибка для {name}: {err}")
 
     return results
+
+
+@redis_service.cache(key="rss_feeds", expire=500)
+async def fetch_feeds(session: aiohttp.ClientSession) -> list[dict]:
+    """
+    Для FastAPI роутеров (/news/).
+    Результат кешируется в Redis на 500 секунд.
+    """
+    return await _fetch_all(session)
+
+
+async def fetch_feeds_raw(session: aiohttp.ClientSession) -> list[dict]:
+    """
+    Для Celery задач.
+    Всегда делает живой HTTP-запрос, без кеша.
+    """
+    return await _fetch_all(session)

@@ -20,8 +20,8 @@ async def get_news(request: Request):
              responses={429: {'model': schemas.ErrorMessage}})
 @limiter.limit('60/minute')
 async def search_news(request: Request, name: str):
-    rss_feeds = await fetch_feeds(request.app.state.session)
-    await process_and_save(rss_feeds)
+    # rss_feeds = await fetch_feeds(request.app.state.session)
+    # await process_and_save(rss_feeds)
 
     articles = await get_articles_semantic(query=name)
 

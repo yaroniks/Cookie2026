@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 async def get_articles_semantic(query: str, top_k: int = 20) -> list[ArticleModel]:
-    query_vec = embedding_service.encode(query)  # уже есть в твоём embedding_service
-    return await ArticleModel.get_articles_for_rag(query_vec, top_k=top_k)  # уже есть в db_service
+    query_vec = embedding_service.encode(query)
+    return await ArticleModel.get_articles_for_rag(query_vec, top_k=top_k)
 
 
 async def process_and_save(raw_articles: list[dict]) -> dict:

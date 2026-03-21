@@ -4,6 +4,7 @@ from config import settings
 from app.utils import rabbitmq_service
 from app.database.base import async_main
 from app.database.redis import redis_service
+from app.utils.scheduler import start_scheduler, stop_scheduler
 
 import aiohttp
 import logging
@@ -28,12 +29,12 @@ async def lifespan(app: FastAPI):
     await async_main()
     app.state.session = aiohttp.ClientSession()
     await redis_service.connect()
-    # await rabbitmq_service.connect()
+    await start_scheduler()
     yield
     # Run on shutdown
+    await stop_scheduler()
     await app.state.session.close()
     await redis_service.close()
-    # await rabbitmq_service.close()
 
 
 app = FastAPI(title=settings.TITLE, version=settings.VERSION, root_path=settings.ROOT_PATH, lifespan=lifespan)
@@ -47,3 +48,4 @@ app.state.limiter = limiter
 
 app.include_router(news_router)
 app.include_router(chat_router)
+app.include_router(graph_router)

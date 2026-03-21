@@ -13,6 +13,7 @@ mistralai
 aiosqlite
 feedparser
 SQLAlchemy
+APScheduler
 fastapi[all]
 pydantic[all]
 python-dotenv

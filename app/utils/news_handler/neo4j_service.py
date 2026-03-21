@@ -63,11 +63,6 @@ class Neo4jService:
 
         logger.info(f'save_to_neo4j: обработано {len(articles)} статей')
 
-
-    # ─────────────────────────────────────────────────────────────
-    # Вспомогательные функции
-    # ─────────────────────────────────────────────────────────────
-
     async def _upsert_article(self, session, article: dict) -> None:
         """Создаёт или обновляет узел Article."""
         await session.run(
@@ -85,7 +80,6 @@ class Neo4jService:
             source=str(article.get('source') or ''),
         )
 
-
     # Маппинг меток spaCy -> типы узлов Neo4j
     _LABEL_TO_NODE: dict[str, str] = {
         'PER':    'Person',
@@ -95,7 +89,6 @@ class Neo4jService:
         'GPE':    'Location',
     }
 
-
     async def _upsert_entities(self, session, article_link: str, entities: list[dict]) -> None:
         """
         Создаёт узлы сущностей и рёбра MENTIONED_IN к статье.
@@ -103,9 +96,10 @@ class Neo4jService:
         """
         for entity in entities:
             node_type = self._LABEL_TO_NODE.get(entity.get('label', ''))
-            name = entity.get('text', '').strip()
 
-            if not node_type or not name:
+            raw_name = entity.get("text")
+            name = raw_name.strip() if isinstance(raw_name, str) else ""
+            if not node_type or not name:  # отсекает None, "", "  "
                 continue
 
             # node_type берётся из фиксированного словаря — инъекция исключена
@@ -119,7 +113,6 @@ class Neo4jService:
                 name=name,
                 link=article_link,
             )
-
 
     async def _upsert_co_occurrences(self, session, article_link: str, entities: list[dict]) -> None:
         """
@@ -155,6 +148,134 @@ class Neo4jService:
                     name1=name1,
                     name2=name2,
                 )
+
+    async def get_co_occurrence_graph(
+            self,
+            min_weight: int = 1,
+            limit: int = 200,
+    ) -> dict:
+        """
+        Возвращает граф совместных упоминаний в формате, удобном для фронтенда
+        (например, для vis.js / D3 / Cytoscape).
+
+        Параметры:
+            min_weight  — минимальный вес ребра (фильтрует редкие связи)
+            limit       — максимальное количество рёбер
+
+        Возвращает:
+        {
+            "nodes": [
+                {"id": "Путин",    "label": "Путин",    "type": "Person"},
+                {"id": "Газпром",  "label": "Газпром",  "type": "Organization"},
+                ...
+            ],
+            "edges": [
+                {"source": "Путин", "target": "Газпром", "weight": 5},
+                ...
+            ]
+        }
+        """
+        query = """
+            MATCH (a)-[r:CO_OCCURS_WITH]-(b)
+            WHERE
+                (a:Person OR a:Organization)
+                AND (b:Person OR b:Organization)
+                AND a.name IS NOT NULL
+                AND b.name IS NOT NULL
+                AND r.weight >= $min_weight
+                // избегаем дублей (a->b и b->a) через лексикографический порядок
+                AND a.name < b.name
+            RETURN
+                a.name        AS source,
+                labels(a)[0]  AS source_type,
+                b.name        AS target,
+                labels(b)[0]  AS target_type,
+                r.weight      AS weight
+            ORDER BY r.weight DESC
+            LIMIT $limit
+        """
+
+        async with self._driver.session() as session:
+            result = await session.run(query, min_weight=min_weight, limit=limit)
+            records = await result.data()
+
+        # Собираем уникальные узлы
+        nodes_map: dict[str, dict] = {}
+        edges: list[dict] = []
+
+        for row in records:
+            src, tgt = row['source'], row['target']
+
+            if src not in nodes_map:
+                nodes_map[src] = {'id': src, 'label': src, 'type': row['source_type']}
+            if tgt not in nodes_map:
+                nodes_map[tgt] = {'id': tgt, 'label': tgt, 'type': row['target_type']}
+
+            edges.append({'source': src, 'target': tgt, 'weight': row['weight']})
+
+        return {'nodes': list(nodes_map.values()), 'edges': edges}
+
+
+    async def get_mentioned_in_graph(self, limit: int = 300) -> dict:
+        """
+        Returns the MENTIONED_IN graph between Article nodes and entities
+        (Person / Organization / Location).
+
+        Response format:
+        {
+            "nodes": [
+                {"id": "art::https://...", "label": "Article title", "type": "Article"},
+                {"id": "ent::Putin",       "label": "Putin",         "type": "Person"},
+            ],
+            "edges": [
+                {"source": "art::https://...", "target": "ent::Putin", "type": "MENTIONED_IN"}
+            ]
+        }
+        """
+        query = """
+            MATCH (a:Article)-[:MENTIONED_IN]->(e)
+            WHERE (e:Person OR e:Organization OR e:Location)
+              AND e.name IS NOT NULL
+              AND trim(e.name) <> ''
+              AND toLower(e.name) <> 'none'
+            RETURN
+                a.link        AS article_link,
+                a.title       AS article_title,
+                e.name        AS entity_name,
+                labels(e)[0]  AS entity_type
+            LIMIT $limit
+        """
+        async with self._driver.session() as session:
+            result = await session.run(query, limit=limit)
+            records = await result.data()
+
+        nodes_map: dict[str, dict] = {}
+        edges: list[dict] = []
+
+        for row in records:
+            art_id = f"art::{row['article_link']}"
+            ent_id = f"ent::{row['entity_name']}"
+
+            if art_id not in nodes_map:
+                nodes_map[art_id] = {
+                    'id': art_id,
+                    'label': row['article_title'] or row['article_link'],
+                    'type': 'Article',
+                }
+            if ent_id not in nodes_map:
+                nodes_map[ent_id] = {
+                    'id': ent_id,
+                    'label': row['entity_name'],
+                    'type': row['entity_type'],
+                }
+
+            edges.append({
+                'source': art_id,
+                'target': ent_id,
+                'type': 'MENTIONED_IN',
+            })
+
+        return {'nodes': list(nodes_map.values()), 'edges': edges}
 
 
 neo4j_service = Neo4jService()
