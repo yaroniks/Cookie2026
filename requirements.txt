@@ -13,7 +13,6 @@ mistralai
 aiosqlite
 feedparser
 SQLAlchemy
-transformers
 fastapi[all]
 pydantic[all]
 python-dotenv
