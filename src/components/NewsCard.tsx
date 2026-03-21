@@ -12,6 +12,25 @@ interface NewsCardProps {
 const NewsCard: React.FC<NewsCardProps> = ({ title, excerpt, time, imageUrl }) => {
   const placeholderImage = robloxImage;
 
+  const formatDateTime = (isoString: string) => {
+    try {
+      const date = new Date(isoString);
+      
+      if (isNaN(date.getTime())) return isoString;
+
+      return new Intl.DateTimeFormat('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(date).replace(',', '');
+    } catch (e) {
+        console.log(e);
+      return isoString;
+    }
+  };
+
   return (
     <article className="bg-[#b3c4ec]/50 rounded-xl shadow-sm border border-gray-100/30 p-5 flex flex-col sm:flex-row gap-6 group hover:shadow-lg hover:border-[#3366CC]/30 transition-all duration-300 h-full">
 
@@ -36,9 +55,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ title, excerpt, time, imageUrl }) =
           </p>
         </div>
 
-        <div className="mt-5 pt-3 border-t border-gray-100/40 flex items-center justify-end text-xs text-gray-500 space-x-1.5">
+        <div className="mt-5 pt-3 border-t border-gray-100/40 flex items-center justify-end text-xs text-gray-500 space-x-1.5 font-medium">
           <Clock className="h-3.5 w-3.5" />
-          <time>{time}</time>
+          <time>{formatDateTime(time)}</time>
         </div>
       </div>
       
