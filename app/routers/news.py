@@ -1,6 +1,7 @@
 from app.database.models import ArticleModel
 import app.schemas as schemas
 from app.limiter import limiter
+from app.utils.news_handler.ner_service import ner_service
 from app.utils.news_handler.news_processor import get_articles_semantic, process_and_save
 from app.utils.news_handler.rss_parser import fetch_feeds
 
@@ -13,21 +14,25 @@ router = APIRouter(prefix='/news', tags=['News'])
             responses={429: {'model': schemas.ErrorMessage}})
 @limiter.limit('60/minute')
 async def get_news(request: Request):
-    return await fetch_feeds(request.app.state.session)
+    feeds = await fetch_feeds(request.app.state.session)[:300]
+    for feed in feeds:
+        text = f"{feed.get('title', '')} {feed.get('description', '')} {feed.get('category', '')}"
+        feed["entities"] = ner_service.extract_entities(text)
+    return feeds
 
 
-@router.post('/search/{name}', summary='Новости по запросу',# response_model=,
+@router.post('/search/{name}', summary='Новости по запросу', response_model=list[schemas.NewsItem],
              responses={429: {'model': schemas.ErrorMessage}})
 @limiter.limit('60/minute')
 async def search_news(request: Request, name: str):
     # rss_feeds = await fetch_feeds(request.app.state.session)
     # await process_and_save(rss_feeds)
 
+    results = []
     articles = await get_articles_semantic(query=name)
-
-    return [
-        {
-            "id": a.id,
+    for a in articles:
+        text = f"{a.title} {a.description} {a.category}"
+        results.append({
             "source": a.source,
             "title": a.title,
             "description": a.description,
@@ -35,7 +40,7 @@ async def search_news(request: Request, name: str):
             "date": a.date,
             "image": a.image,
             "category": a.category,
-            "cluster_id": a.cluster_id,
-        }
-        for a in articles
-    ]
+            "entities": ner_service.extract_entities(text)
+        })
+
+    return results

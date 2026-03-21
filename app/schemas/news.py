@@ -1,7 +1,13 @@
 from app.utils.enums import SourceEnum
+from app.utils.enums import EntityEnum
 
 from typing import Optional
 from pydantic import BaseModel, Field
+
+
+class Entity(BaseModel):
+    text: str
+    label: EntityEnum
 
 
 class NewsItem(BaseModel):
@@ -14,3 +20,4 @@ class NewsItem(BaseModel):
     date: Optional[str] = Field(description='Дата публикации')
     image: Optional[str] = Field(description='Ссылка на картинку')
     category: Optional[str] = Field(description='Категория новости')
+    entities: list[Entity] = Field(description='Список сущностей')

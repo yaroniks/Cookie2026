@@ -21,7 +21,7 @@ class NERService:
             return []
         doc = self.nlp(text[:10000])  # spaCy имеет лимит
         entities = []
-        seen = set()
+        seen = set('None')
 
         for ent in doc.ents:
             # Фильтруем нужные типы

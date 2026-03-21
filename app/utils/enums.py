@@ -9,3 +9,11 @@ class SourceEnum(Enum):
     vedomosti = 'vedomosti'
     habr = 'habr'
     cnews = 'cnews'
+
+
+class EntityEnum(Enum):
+    PER = "PER"
+    PERSON = "PERSON"
+    ORG = "ORG"
+    LOC = "LOC"
+    GPE = "GPE"
