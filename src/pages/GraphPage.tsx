@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import GraphView from '../components/graph/GraphView';
 import type { Node, Link } from '../components/graph/GraphView';
 import GraphControls from '../components/graph/GraphControls';
@@ -31,9 +31,37 @@ const mockGraphData = {
 
 const GraphPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
-  const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
-  const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(new Set());
+  const [searchParams] = useSearchParams();
+  const activeName = searchParams.get('active');
+
+  // Инициализируем стейты сразу на основе параметров URL
+  const initialData = useMemo(() => {
+    const nodes = new Set<string>();
+    const links = new Set<Link>();
+    const selected = new Set<string>();
+
+    if (activeName) {
+      const targetNode = mockGraphData.nodes.find(n => n.name === activeName);
+      if (targetNode) {
+        nodes.add(targetNode.id);
+        selected.add(targetNode.name);
+        mockGraphData.links.forEach(link => {
+          const sId = typeof link.source === 'object' ? (link.source as Node).id : link.source;
+          const tId = typeof link.target === 'object' ? (link.target as Node).id : link.target;
+          if (sId === targetNode.id || tId === targetNode.id) {
+            links.add(link);
+            nodes.add(sId);
+            nodes.add(tId);
+          }
+        });
+      }
+    }
+    return { nodes, links, selected };
+  }, [activeName]);
+
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(initialData.selected);
+  const [highlightNodes, setHighlightNodes] = useState<Set<string>>(initialData.nodes);
+  const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(initialData.links);
 
   const handleNodeClick = useCallback((node: Node) => {
     const newHighlightNodes = new Set<string>();

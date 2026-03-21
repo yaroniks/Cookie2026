@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X, Clock, Globe, Tag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export interface Entity {
   name: string;
@@ -22,6 +23,8 @@ interface NewsModalProps {
 }
 
 const NewsModal: React.FC<NewsModalProps> = ({ isOpen, onClose, article }) => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -47,7 +50,7 @@ const NewsModal: React.FC<NewsModalProps> = ({ isOpen, onClose, article }) => {
         hour: '2-digit', minute: '2-digit',
       }).format(date).replace(',', '');
     } catch (e) {
-        console.log(e)
+      console.log(e)
       return isoString;
     }
   };
@@ -101,9 +104,16 @@ const NewsModal: React.FC<NewsModalProps> = ({ isOpen, onClose, article }) => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {article.entities.map((entity, idx) => (
-                  <div key={idx} className={`px-3 py-1.5 border rounded-lg text-sm font-semibold cursor-pointer ${entityColors[entity.type]}`}>
+                  <button 
+                    key={idx} 
+                    onClick={() => {
+                      onClose();
+                      navigate(`/graph?active=${encodeURIComponent(entity.name)}`);
+                    }}
+                    className={`px-3 py-1.5 border rounded-lg text-sm font-semibold transition-transform active:scale-95 ${entityColors[entity.type]}`}
+                  >
                     {entity.name}
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
