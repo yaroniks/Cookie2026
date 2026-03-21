@@ -34,6 +34,7 @@ async def search_news(request: Request, name: str):
         text = f"{a.title} {a.description} {a.category}"
         results.append({
             "source": a.source,
+            "author": a.author,
             "title": a.title,
             "description": a.description,
             "link": a.link,
