@@ -53,6 +53,7 @@ const HomePage: React.FC = () => {
       }
     };
 
+    // Фильтр сущностей: убираем мусор и дубликаты
     const validEntities = (newsItem.entities || []).filter(e => {
       if (!e.text) return false;
       const text = e.text.trim().toLowerCase();
@@ -71,7 +72,7 @@ const HomePage: React.FC = () => {
       title: newsItem.title,
       excerpt: newsItem.description || "",
       time: newsItem.date,
-      link: newsItem.link, 
+      link: newsItem.link,
       imageUrl: newsItem.image || undefined,
       source: newsItem.source,
       entities: Array.from(uniqueEntitiesMap.values()).map(e => ({
@@ -89,6 +90,7 @@ const HomePage: React.FC = () => {
         onClose={() => setIsModalOpen(false)} 
         article={selectedNews} 
       />
+      
       <main className="mx-auto max-w-7xl">
 
         {!isLoading && !query && (
@@ -100,14 +102,22 @@ const HomePage: React.FC = () => {
             ЗАГРУЖАЕМ НОВОСТИ...
           </div>
         ) : (
-          clusters.map((cluster) => (
-            <NewsCluster 
-              key={cluster.category}
-              category={cluster.category} 
-              news={cluster.news} 
-              onNewsClick={handleOpenNews}
-            />
-          ))
+          <div className="space-y-12">
+            {clusters.map((cluster) => (
+              <NewsCluster 
+                key={cluster.category}
+                category={cluster.category} 
+                news={cluster.news} 
+                onNewsClick={handleOpenNews}
+              />
+            ))}
+          </div>
+        )}
+
+        {!isLoading && clusters.length === 0 && (
+          <div className="py-20 text-xl font-bold text-center uppercase text-white/70">
+            Ничего не найдено
+          </div>
         )}
       </main>
     </div>
