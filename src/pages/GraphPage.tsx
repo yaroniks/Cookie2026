@@ -43,7 +43,6 @@ const GraphPage: React.FC = () => {
   const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
   const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(new Set());
 
-  // Чистая логика расчета связей без побочных эффектов
   const getHighlightData = useCallback((targetNode: Node, allLinks: Link[]) => {
     const hNodes = new Set<string>();
     const hLinks = new Set<Link>();
@@ -136,7 +135,7 @@ const GraphPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-full bg-[#0f172a] flex items-center justify-center font-mono text-blue-400">
-        <span className="animate-pulse">LOADING_DATA...</span>
+        <span className="animate-pulse">Загрузка...</span>
       </div>
     );
   }

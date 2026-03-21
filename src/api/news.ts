@@ -1,7 +1,11 @@
 import api from '../lib/axios';
 
+export interface EntityFromAPI {
+  text: string;
+  label: 'PER' | 'LOC' | 'ORG' | string;
+}
+
 export interface NewsItem {
-  id?: number;
   source: string;
   author?: string;
   title: string;
@@ -10,7 +14,7 @@ export interface NewsItem {
   date: string;
   image: string | null;
   category: string;
-  cluster_id?: number;
+  entities: EntityFromAPI[];
 }
 
 export const fetchNews = async (): Promise<NewsItem[]> => {
