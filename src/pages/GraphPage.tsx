@@ -84,10 +84,15 @@ const GraphPage: React.FC = () => {
         const { data } = await api.get<GraphResponse>('/graph/co-occurrences');
 
         const nodesMap = new Map<string, Node>();
+
+        const isTypeValid = (t: string): t is NodeType => {
+          return VALID_TYPES.includes(t as NodeType);
+        };
+
         data.nodes.forEach(n => {
           if (n.id !== "None" && n.label !== "None") {
-            const rawType = n.type.toLowerCase() as NodeType;
-            const safeType = VALID_TYPES.includes(rawType) ? rawType : 'event';
+            const rawType = n.type.toLowerCase();
+            const safeType: NodeType = isTypeValid(rawType) ? rawType : 'event';
             
             nodesMap.set(n.id, {
               id: n.id,
