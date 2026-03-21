@@ -52,7 +52,7 @@ const HomePage: React.FC = () => {
       }
     };
 
-    // фильтр ,убираем None, пустые строки и дубликаты
+    // фильтр, убираем None, пустые строки и дубликаты
     const validEntities = (newsItem.entities || []).filter(e => {
       if (!e.text) return false;
       const text = e.text.trim().toLowerCase();
@@ -71,6 +71,7 @@ const HomePage: React.FC = () => {
       title: newsItem.title,
       excerpt: newsItem.description || "",
       time: newsItem.date,
+      link: newsItem.link,
       imageUrl: newsItem.image || undefined,
       source: newsItem.source,
       entities: Array.from(uniqueEntitiesMap.values()).map(e => ({
