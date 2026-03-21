@@ -35,16 +35,14 @@ const MainNews: React.FC<MainNewsProps> = ({ onNewsClick }) => {
 
   return (
     <div className="relative w-full mb-12 overflow-hidden border shadow-2xl rounded-3xl min-h-125 lg:h-150 border-white/10 bg-slate-900 group">
-      {/* Фоновое фото */}
+
       {news.image && (
         <img src={news.image} alt="" className="absolute inset-0 object-cover w-full h-full" />
       )}
       <div className="absolute inset-0 bg-slate-950/40" />
 
-      {/* Правая панель с адаптивной шириной */}
       <div className="absolute inset-y-0 right-0 flex flex-col w-full p-4 space-y-3 sm:w-1/2 md:w-2/5 lg:w-1/3 sm:p-6 lg:p-8 sm:space-y-4">
         
-        {/* Синий блок (Заголовок) */}
         <div className="bg-[#3366CC]/85 backdrop-blur-md p-5 lg:p-7 rounded-2xl border border-blue-400/20 shadow-xl flex flex-col justify-center min-h-fit">
           <div className="mb-2">
              <span className="px-2 py-0.5 text-[10px] font-black text-blue-900 uppercase bg-white rounded">
