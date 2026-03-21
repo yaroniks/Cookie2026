@@ -5,6 +5,7 @@ import { fetchNews, searchNews, type NewsItem } from '../api/news';
 import { groupNewsByCategory } from '../utils/newsUtils';
 import NewsModal from '../components/NewsModal';
 import type { NewsDetail, Entity } from '../components/NewsModal';
+import MainNews from '../components/MainNews';
 
 interface ClusterData {
   category: string;
@@ -89,6 +90,11 @@ const HomePage: React.FC = () => {
         article={selectedNews} 
       />
       <main className="mx-auto max-w-7xl">
+
+        {!isLoading && !query && (
+          <MainNews onNewsClick={handleOpenNews} />
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center h-64 text-2xl font-black text-white animate-pulse">
             ЗАГРУЖАЕМ НОВОСТИ...
