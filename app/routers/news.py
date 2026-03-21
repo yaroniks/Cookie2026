@@ -16,7 +16,7 @@ async def get_news(request: Request):
     return await fetch_feeds(request.app.state.session)
 
 
-@router.post('/search/{name}', summary='Новости по запросу', #response_model=...,
+@router.post('/search/{name}', summary='Новости по запросу',# response_model=,
              responses={429: {'model': schemas.ErrorMessage}})
 @limiter.limit('60/minute')
 async def search_news(request: Request, name: str):

@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Query
 from app.utils.news_handler.neo4j_service import neo4j_service
+import app.schemas as schemas
+
+from fastapi import APIRouter, Query
+
 
 router = APIRouter(prefix="/graph", tags=["graph"])
 
 
-@router.get("/co-occurrences")
+@router.get("/co-occurrences", summary='Возвращает график CO_OCCURS_WITH между узлами Person/Organization.',
+            )# response_model=schemas.Occurrences
 async def get_co_occurrences(
         min_weight: int = Query(default=1, ge=1, description="Minimum edge weight"),
         limit: int = Query(default=200, ge=1, le=1000, description="Max number of edges"),

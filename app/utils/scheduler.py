@@ -2,6 +2,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import aiohttp
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -35,6 +36,7 @@ async def start_scheduler():
         id="fetch_and_process",
         replace_existing=True,
         max_instances=1,
+        next_run_time=datetime.now(),
     )
     scheduler.start()
     logger.info("scheduler: запущен")
