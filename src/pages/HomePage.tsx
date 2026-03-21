@@ -34,7 +34,7 @@ const HomePage: React.FC = () => {
         const grouped = groupNewsByCategory(data) as unknown as ClusterData[];
         setClusters(grouped);
       } catch (err) {
-        console.error("Ошибка загрузки новостей:", err);
+        console.error("Ошибка загрузки:", err);
         setClusters([]);
       } finally {
         setIsLoading(false);
@@ -45,28 +45,17 @@ const HomePage: React.FC = () => {
 
   const handleOpenNews = (newsItem: NewsItem) => {
     const mapType = (label: string): Entity['type'] => {
-      switch (label) {
-        case 'PER': return 'person';
-        case 'LOC': return 'location';
-        case 'ORG': return 'organization';
-        default: return 'event';
-      }
+      if (label === 'PER') return 'person';
+      if (label === 'LOC') return 'location';
+      if (label === 'ORG') return 'organization';
+      return 'event';
     };
 
-    // Фильтр сущностей: убираем мусор и дубликаты
-    const validEntities = (newsItem.entities || []).filter(e => {
-      if (!e.text) return false;
-      const text = e.text.trim().toLowerCase();
-      return text !== '' && text !== 'none' && text !== 'null';
-    });
+    const validEntities = (newsItem.entities || []).filter(e => 
+      e.text && !['', 'none', 'null'].includes(e.text.trim().toLowerCase())
+    );
 
-    const uniqueEntitiesMap = new Map();
-    validEntities.forEach(e => {
-      const key = e.text.trim().toLowerCase();
-      if (!uniqueEntitiesMap.has(key)) {
-        uniqueEntitiesMap.set(key, e);
-      }
-    });
+    const uniqueEntities = Array.from(new Map(validEntities.map(e => [e.text.toLowerCase(), e])).values());
 
     setSelectedNews({
       title: newsItem.title,
@@ -75,34 +64,29 @@ const HomePage: React.FC = () => {
       link: newsItem.link,
       imageUrl: newsItem.image || undefined,
       source: newsItem.source,
-      entities: Array.from(uniqueEntitiesMap.values()).map(e => ({
-        name: e.text,
-        type: mapType(e.label)
-      }))
+      entities: uniqueEntities.map(e => ({ name: e.text, type: mapType(e.label) }))
     });
     setIsModalOpen(true);
   };
 
   return (
-    <div className="bg-[#a5bef4] min-h-screen py-10 px-4">
-      <NewsModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        article={selectedNews} 
-      />
+    <div className="bg-[#a5bef4] min-h-screen py-12 px-4 flex flex-col items-center">
+      <NewsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} article={selectedNews} />
       
-      <main className="mx-auto max-w-7xl">
+      <main className="w-full max-w-7xl">
 
         {!isLoading && !query && (
-          <MainNews onNewsClick={handleOpenNews} />
+          <div className="pb-12">
+            <MainNews onNewsClick={handleOpenNews} />
+          </div>
         )}
 
         {isLoading ? (
           <div className="flex items-center justify-center h-64 text-2xl font-black text-white animate-pulse">
-            ЗАГРУЖАЕМ НОВОСТИ...
+            ЗАГРУЗКА...
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-16">
             {clusters.map((cluster) => (
               <NewsCluster 
                 key={cluster.category}
@@ -111,12 +95,6 @@ const HomePage: React.FC = () => {
                 onNewsClick={handleOpenNews}
               />
             ))}
-          </div>
-        )}
-
-        {!isLoading && clusters.length === 0 && (
-          <div className="py-20 text-xl font-bold text-center uppercase text-white/70">
-            Ничего не найдено
           </div>
         )}
       </main>
