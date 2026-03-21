@@ -16,17 +16,29 @@ const NewsCluster: React.FC<ClusterProps> = ({ category, news, onNewsClick }) =>
       </div>
       <div className="p-6 bg-white sm:p-10"> 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {news.map((item, index) => (
-            <div key={`${item.title}-${index}`} className={!item.image ? "lg:col-span-1" : "lg:col-span-2"}>
-              <NewsCard 
-                title={item.title}
-                excerpt={item.description || ""}
-                time={item.date}
-                imageUrl={item.image || undefined}
-                onClick={() => onNewsClick(item)} 
-              />
-            </div>
-          ))}
+          {news.map((item, index) => {
+
+            const hasImage = !!item.image;
+            const isLast = index === news.length - 1;
+            const isOdd = (index + 1) % 2 !== 0;
+            
+            const shouldFullWidth = hasImage || (isLast && isOdd);
+
+            return (
+              <div 
+                key={`${item.title}-${index}`} 
+                className={shouldFullWidth ? "lg:col-span-2" : "lg:col-span-1"}
+              >
+                <NewsCard 
+                  title={item.title}
+                  excerpt={item.description || ""}
+                  time={item.date}
+                  imageUrl={item.image || undefined}
+                  onClick={() => onNewsClick(item)} 
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
