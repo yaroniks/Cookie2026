@@ -1,6 +1,7 @@
 from app.database.models import ArticleModel
 import app.schemas as schemas
 from app.limiter import limiter
+from app.utils.ai_chat import MistralChat
 from app.utils.news_handler.ner_service import ner_service
 from app.utils.news_handler.news_processor import get_articles_semantic, process_and_save
 from app.utils.news_handler.rss_parser import fetch_feeds
@@ -19,6 +20,29 @@ async def get_news(request: Request):
         text = f"{feed.get('title', '')} {feed.get('description', '')} {feed.get('category', '')}"
         feed["entities"] = await ner_service.extract_entities(text)
     return feeds[:300]
+
+
+@router.get('/main', summary='Главная новость', response_model=schemas.NewsItem,
+            responses={429: {'model': schemas.ErrorMessage}})
+@limiter.limit('60/minute')
+async def news_main(request: Request):
+    feeds = await fetch_feeds(request.app.state.session)
+    for feed in feeds:
+        if not feed.get('title') or not feed.get('description') or not feed.get('image'):
+            feeds.remove(feed)
+
+    number = await MistralChat.get_response(f'ДАН СПИСОК НОВОСТЕЙ ТЫ ДОЛЖЕН ОТВЕТИТЬ ИНДЕКСОМ САМОЙ ИНТЕРЕСНОЙ НОВОСТИ, '
+                                            f'ОДНИМ ЛИШЬ ЧИСЛОМ, НИЧЕГО ЛИШНЕГО В ОТВЕТЕ КРОМЕ ЦИФР НЕ ДОЛЖНО БЫТЬ\n'
+                                            f'СПИСОК НОВОСТЕЙ: {feeds}')
+    if number.isdigit():
+        try:
+            result = feeds[int(number)]
+        except:
+            result = feeds[0]
+    else:
+        result = feeds[0]
+
+    return result
 
 
 @router.post('/search/{name}', summary='Новости по запросу', response_model=list[schemas.NewsItem],

@@ -32,7 +32,7 @@ async def fetch_and_process_job():
 async def start_scheduler():
     scheduler.add_job(
         fetch_and_process_job,
-        trigger=IntervalTrigger(minutes=15),
+        trigger=IntervalTrigger(minutes=60),
         id="fetch_and_process",
         replace_existing=True,
         max_instances=1,

@@ -99,7 +99,7 @@ async def _fetch_all(session: aiohttp.ClientSession) -> list[dict]:
     return results
 
 
-@redis_service.cache(key="rss_feeds", expire=500)
+@redis_service.cache(key="rss_feeds", expire=1800)
 async def fetch_feeds(session: aiohttp.ClientSession) -> list[dict]:
     """
     Для FastAPI роутеров (/news/).

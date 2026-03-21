@@ -56,3 +56,11 @@ class MistralChat:
                     yield chunk.data.choices[0].delta.content
 
             MistralChat.chats[token].append({"role": "assistant", "content": answer})
+
+    @staticmethod
+    async def get_response(text: str) -> str:
+        async with Mistral(api_key=settings.MISTRAL_API) as mistral:
+            chat_response = await mistral.chat.complete_async(
+                model='mistral-large-latest', messages=[{"role": "user", "content": text}]
+            )
+            return chat_response.choices[0].message.content

@@ -1,8 +1,8 @@
-from app.utils.news_handler.clustering_service import clustering_service
+from app.database.models import ArticleModel
 from app.utils.news_handler.ner_service import ner_service
 from app.utils.news_handler.neo4j_service import neo4j_service
-from app.database.models import ArticleModel
 from app.utils.news_handler.embedding_service import embedding_service
+from app.utils.news_handler.clustering_service import clustering_service
 
 import logging
 
