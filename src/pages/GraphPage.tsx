@@ -43,14 +43,12 @@ const GraphPage: React.FC = () => {
   const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
   const [highlightLinks, setHighlightLinks] = useState<Set<Link>>(new Set());
 
-  // Сброс всех выделений
   const resetSelection = useCallback(() => {
     setSelectedNodes(new Set());
     setHighlightNodes(new Set());
     setHighlightLinks(new Set());
   }, []);
 
-  // Обработка клавиши ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -166,6 +164,8 @@ const GraphPage: React.FC = () => {
         onBack={() => navigate(-1)}
         onSearch={handleSearch}
         typeColors={typeColors}
+        nodes={graphData.nodes}
+        onNodeSelect={handleNodeClick}
       />
       <GraphView 
         data={graphData}
