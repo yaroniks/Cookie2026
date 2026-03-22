@@ -7,7 +7,7 @@ from fastapi import APIRouter, Request
 router = APIRouter(prefix='/currencies', tags=['Currencies'])
 
 
-@router.get('/', summary='Получить актуальный курс валют', response_model=...,
+@router.get('/', summary='Получить актуальный курс валют', response_model=list[schemas.GetCurrencies],
             responses={429: {'model': schemas.ErrorMessage}})
 @limiter.limit('60/minute')
 async def get_currencies(request: Request):
