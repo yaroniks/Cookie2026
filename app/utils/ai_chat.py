@@ -39,18 +39,15 @@ class MistralChat:
         content = (f'Контекст — найденные новостные статьи:\n'
                    f'{context}\nВопрос пользователя: {text}\n'
                    f'Дай развёрнутый ответ, опираясь на статьи выше.\n'
-                   f'В конце укажи статьи, которые использовал\n'
-                   f'ОТВЕЧАЙ ТОЛЬКО ТОГДА, КОГДА ПОЛЬЗОВАТЕЛЬ ДЕЙСТВИТЕЛЬНО СПРОСИЛ О НОВОСТЯХ ИЛИ СВЯЗАННОМ СЛУЧАЕ '
-                   f'В ОСТАЛЬНОМ ОТКАЗЫВАЙСЯ')
+                   f'В конце укажи статьи, которые использовал\n')
 
         if MistralChat.chats.get(token):
             MistralChat.chats[token].append(
-                {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": content}
             )
             messages = MistralChat.chats[token]
         else:
-            messages = [{"role": "user", "content": content}]
+            messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": content}]
             MistralChat.chats[token] = messages
 
         async with Mistral(api_key=settings.MISTRAL_API) as mistral:
