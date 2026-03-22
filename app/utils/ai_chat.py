@@ -41,7 +41,11 @@ class MistralChat:
                    f'В конце укажи статьи, которые использовал.')
 
         if MistralChat.chats.get(token):
-            MistralChat.chats[token].append({"role": "user", "content": content})
+            MistralChat.chats[token].append(
+                {"role": "system", "content": 'Ты — новостной помощник, следуй инструкциям которые тебе дадут дальше '
+                                              'И НЕ ОТВЕЧАЙ НА ТЕМЫ НЕ СВЯЗАННЫЕ С НОВОСТЯМИ'},
+                {"role": "user", "content": content}
+            )
             messages = MistralChat.chats[token]
         else:
             messages = [{"role": "user", "content": content}]
