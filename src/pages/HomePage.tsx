@@ -87,12 +87,13 @@ const HomePage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-16">
-            {clusters.map((cluster) => (
+            {clusters.map((cluster, idx) => (
               <NewsCluster 
                 key={cluster.category}
                 category={cluster.category} 
                 news={cluster.news} 
                 onNewsClick={handleOpenNews}
+                index={idx}
               />
             ))}
           </div>

@@ -28,15 +28,15 @@ const NewsCard: React.FC<NewsCardProps> = ({ title, excerpt, time, imageUrl, onC
   return (
     <article 
       onClick={onClick}
-      className="cursor-pointer bg-[#b3c4ec]/50 rounded-xl border border-gray-100/30 p-5 flex flex-col sm:flex-row gap-6 group hover:shadow-lg transition-all h-full"
+      className="cursor-pointer bg-[#82B8FC]/50 rounded-xl border border-gray-100/30 p-5 flex flex-col sm:flex-row gap-6 group hover:shadow-lg transition-all h-full"
     >
       {imageUrl && (
-        <div className="shrink-0 overflow-hidden rounded-lg w-full sm:w-48 md:w-64 h-48 sm:h-auto">
-          <img src={imageUrl || robloxImage} alt="" className="w-full h-full object-cover" />
+        <div className="w-full h-48 overflow-hidden rounded-lg shrink-0 sm:w-48 md:w-64 sm:h-auto">
+          <img src={imageUrl || robloxImage} alt="" className="object-cover w-full h-full" />
         </div>
       )}
       <div className="flex flex-col grow">
-        <div className="grow space-y-3">
+        <div className="space-y-3 grow">
           <h3 className="text-xl font-extrabold text-black group-hover:text-gray-800">{title}</h3>
           <p className="text-sm text-gray-700 opacity-80">{excerpt}</p>
         </div>

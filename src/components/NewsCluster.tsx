@@ -6,22 +6,28 @@ interface ClusterProps {
   category: string;
   news: NewsItem[];
   onNewsClick: (newsItem: NewsItem) => void;
+  index: number;
 }
 
-const NewsCluster: React.FC<ClusterProps> = ({ category, news, onNewsClick }) => {
+const NewsCluster: React.FC<ClusterProps> = ({ category, news, onNewsClick, index }) => {
+  const headerBg = index % 2 === 0 ? 'bg-[#5C89E8]' : 'bg-[#FF9900]/85';
+
   return (
     <section className="mb-12 overflow-hidden border shadow-2xl rounded-2xl border-white/20">
-      <div className="bg-[#5C89E8] text-white py-6 px-6 text-center">
-        <h2 className="text-4xl font-light uppercase tracking-widest text-[#E6FFFF]">{category}</h2>
+      {/* Применяем динамический фон для заголовка */}
+      <div className={`${headerBg} text-white py-6 px-6 text-center transition-colors duration-500`}>
+        <h2 className="text-4xl font-light uppercase tracking-widest text-[#E6FFFF]">
+          {category}
+        </h2>
       </div>
+
       <div className="p-6 bg-white sm:p-10"> 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {news.map((item, index) => {
+          {news.map((item, idx) => {
             const hasImage = !!item.image;
-
-            const isFirstInRow = (index % 2 === 0);
-            const nextItemHasNoImage = news[index + 1] && !news[index + 1].image;
-            const prevItemHasNoImage = news[index - 1] && !news[index - 1].image;
+            const isFirstInRow = (idx % 2 === 0);
+            const nextItemHasNoImage = news[idx + 1] && !news[idx + 1].image;
+            const prevItemHasNoImage = news[idx - 1] && !news[idx - 1].image;
             
             let shouldFullWidth = hasImage;
             
@@ -32,7 +38,7 @@ const NewsCluster: React.FC<ClusterProps> = ({ category, news, onNewsClick }) =>
 
             return (
               <div 
-                key={`${item.title}-${index}`} 
+                key={`${item.title}-${idx}`} 
                 className={shouldFullWidth ? "lg:col-span-2" : "lg:col-span-1"}
               >
                 <NewsCard 
