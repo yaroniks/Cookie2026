@@ -207,14 +207,13 @@ class Neo4jService:
             src, tgt = row['source'], row['target']
 
             if src not in nodes_map:
-                nodes_map[src] = {'id': src, 'label': src, 'type': row['source_type']}
+                nodes_map[src] = {'id': src.replace('None', ''), 'label': src.replace('None', ''), 'type': row['source_type']}
             if tgt not in nodes_map:
-                nodes_map[tgt] = {'id': tgt, 'label': tgt, 'type': row['target_type']}
+                nodes_map[tgt] = {'id': tgt.replace('None', ''), 'label': tgt.replace('None', ''), 'type': row['target_type']}
 
-            edges.append({'source': src, 'target': tgt, 'weight': row['weight']})
+            edges.append({'source': src.replace('None', ''), 'target': tgt.replace('None', ''), 'weight': row['weight']})
 
         return {'nodes': list(nodes_map.values()), 'edges': edges}
-
 
     async def get_mentioned_in_graph(self, limit: int = 300) -> dict:
         """
