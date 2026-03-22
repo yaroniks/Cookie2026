@@ -27,7 +27,7 @@ const CurrencyBar: React.FC = () => {
   if (isLoading || currencies.length === 0) return null;
 
   return (
-    <div className="w-full mb-8 overflow-hidden">
+    <div className="w-full mb-20 overflow-hidden">
       <div className="flex flex-wrap items-center justify-center gap-4 px-6 py-4 border shadow-lg bg-white/30 backdrop-blur-md rounded-2xl border-white/40">
         <div className="items-center hidden gap-2 pr-4 border-r md:flex border-white/20">
           <span className="text-[10px] font-black text-blue-800 uppercase tracking-tighter">Курсы валют</span>
