@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#a5bef4] min-h-screen py-12 px-4 flex flex-col items-center">
+    <div className="bg-[#b8c5dc] min-h-screen py-12 px-4 flex flex-col items-center">
       <NewsModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
