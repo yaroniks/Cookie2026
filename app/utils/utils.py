@@ -25,6 +25,9 @@ async def get_main_new(session):
             result = valid_feeds[0]
     else:
         result = valid_feeds[0]
-    text = f"{result.get('title', '')} {result.get('description', '')} {result.get('category', '')}"
-    result["entities"] = await ner_service.extract_entities(text)
+    text = f"{result.get('title', '')} {result.get('description', '')} {result.get('category', '')}".replace('None', '')
+    if text.replace(' ', ''):
+        result["entities"] = await ner_service.extract_entities(text)
+    else:
+        result["entities"] = []
     return result

@@ -37,8 +37,11 @@ async def process_and_save(raw_articles: list[dict]) -> dict:
 
     # Шаг 2: NER — добавляем поле entities к каждой статье
     for article in clustered:
-        text = f"{article.get('title', '')} {article.get('description', '')} {article.get('category', '')}"
-        article["entities"] = await ner_service.extract_entities(text)
+        text = f"{article.get('title', '')} {article.get('description', '')} {article.get('category', '')}".replace('None', '')
+        if text.replace(' ', ''):
+            article["entities"] = await ner_service.extract_entities(text)
+        else:
+            article["entities"] = []
 
     logger.info("process_and_save: NER завершён")
 

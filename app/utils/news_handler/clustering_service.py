@@ -14,7 +14,7 @@ class ClusteringService:
         cluster_id = -1 означает "шум" (статья ни в один кластер не попала).
         """
         texts = [
-            f"{a.get('title', '')} {a.get('description', '')} {a.get('category', '')}"
+            f"{a.get('title', '')} {a.get('description', '')} {a.get('category', '')}".replace('None', '')
             for a in articles
         ]
         embeddings = embedding_service.encode_batch(texts)

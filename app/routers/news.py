@@ -16,8 +16,11 @@ router = APIRouter(prefix='/news', tags=['News'])
 async def get_news(request: Request):
     feeds = await fetch_feeds(request.app.state.session)
     for feed in feeds[:300]:
-        text = f"{feed.get('title', '')} {feed.get('description', '')} {feed.get('category', '')}"
-        feed["entities"] = await ner_service.extract_entities(text)
+        text = f"{feed.get('title', '')} {feed.get('description', '')} {feed.get('category', '')}".replace('None', '')
+        if text.replace(' ', ''):
+            feed["entities"] = await ner_service.extract_entities(text)
+        else:
+            feed["entities"] = []
     return feeds[:300]
 
 
