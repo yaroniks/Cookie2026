@@ -6,6 +6,7 @@ import { groupNewsByCategory } from '../utils/newsUtils';
 import NewsModal from '../components/NewsModal';
 import type { NewsDetail, Entity } from '../components/NewsModal';
 import MainNews from '../components/MainNews';
+import CurrencyBar from '../components/CurrencyBar';
 
 interface ClusterData {
   category: string;
@@ -64,21 +65,31 @@ const HomePage: React.FC = () => {
       link: newsItem.link,
       imageUrl: newsItem.image || undefined,
       source: newsItem.source,
-      entities: uniqueEntities.map(e => ({ name: e.text, type: mapType(e.label) }))
+      entities: uniqueEntities.map(e => ({ 
+        name: e.text, 
+        type: mapType(e.label) 
+      }))
     });
     setIsModalOpen(true);
   };
 
   return (
     <div className="bg-[#a5bef4] min-h-screen py-12 px-4 flex flex-col items-center">
-      <NewsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} article={selectedNews} />
+      <NewsModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        article={selectedNews} 
+      />
       
       <main className="w-full max-w-7xl">
-
+        {/* Показываем главную новость и курсы только если нет поиска */}
         {!isLoading && !query && (
-          <div className="pb-12">
-            <MainNews onNewsClick={handleOpenNews} />
-          </div>
+          <>
+            <div className="pb-8">
+              <MainNews onNewsClick={handleOpenNews} />
+            </div>
+            <CurrencyBar />
+          </>
         )}
 
         {isLoading ? (
@@ -96,6 +107,12 @@ const HomePage: React.FC = () => {
                 index={idx}
               />
             ))}
+          </div>
+        )}
+
+        {!isLoading && clusters.length === 0 && (
+          <div className="py-20 text-xl italic font-bold text-center uppercase text-white/70">
+            По вашему запросу новостей не нашлось
           </div>
         )}
       </main>
