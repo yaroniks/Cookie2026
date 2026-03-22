@@ -17,8 +17,8 @@ class NERService:
             }, ...
         ]
         """
-        if await redis_service.get(text.replace(' ', '_')):
-            return await redis_service.get(text.replace(' ', '_'))
+        if await redis_service.get(text.lower().replace(' ', '_')):
+            return await redis_service.get(text.lower().replace(' ', '_'))
 
         if not text:
             return []
@@ -42,7 +42,7 @@ class NERService:
                 "label": ent.label_,
             })
 
-        await redis_service.set(text.replace(' ', '_'), entities)
+        await redis_service.set(text.lower().replace(' ', '_'), entities)
         return entities
 
 

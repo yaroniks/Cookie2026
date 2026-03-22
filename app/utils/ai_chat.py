@@ -1,5 +1,6 @@
-from app.database import ArticleModel
 from config import settings
+from app.database import ArticleModel
+from app.database.redis import redis_service
 from app.utils.news_handler.embedding_service import embedding_service
 
 from mistralai.client import Mistral
@@ -17,14 +18,17 @@ class MistralChat:
     @staticmethod
     async def get_context(query: str):
         """Создание контекста для сообщения"""
-        context = ''
+        if await redis_service.get(query.lower().replace(' ', '_')):
+            return await redis_service.get(query.lower().replace(' ', '_'))
 
-        query_vec = embedding_service.encode(query)
+        context = ''
+        query_vec = await embedding_service.encode(query)
         articles = await ArticleModel.get_articles_for_rag(query_vec)
 
         for a in articles:
             context += f'\nИсточник: {a.source}\nДата: {a.date}\nЗаголовок: {a.title}\nОписание: {a.description}\nСсылка: {a.link}\n'
 
+        await redis_service.set(query.lower().replace(' ', '_'), context, 3600)
         return context
 
     @staticmethod

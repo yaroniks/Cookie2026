@@ -1,3 +1,5 @@
+from app.database.redis import redis_service
+
 import aiohttp
 import xml.etree.ElementTree as et
 
@@ -10,6 +12,7 @@ TARGET_CURRENCIES = {
 }
 
 
+@redis_service.cache(key='currencies', expire=1800)
 async def parse_currencies(session: aiohttp.ClientSession) -> list[dict]:
     async with session.get('https://www.cbr.ru/scripts/XML_daily.asp') as response:
         xml = await response.text()
