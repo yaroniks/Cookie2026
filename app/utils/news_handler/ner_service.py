@@ -37,10 +37,12 @@ class NERService:
                 continue
             seen.add(key)
 
-            entities.append({
-                "text": ent.text.strip(),
-                "label": ent.label_,
-            })
+            clear_text = text.replace('None', '')
+            if clear_text.replace(' ', ''):
+                entities.append({
+                    "text": ent.text.strip(),
+                    "label": ent.label_,
+                })
 
         await redis_service.set(text.lower().replace(' ', '_'), entities)
         return entities
