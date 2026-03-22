@@ -12,7 +12,7 @@ const NewsCluster: React.FC<ClusterProps> = ({ category, news, onNewsClick }) =>
   return (
     <section className="mb-12 overflow-hidden border shadow-2xl rounded-2xl border-white/20">
       <div className="bg-[#5C89E8] text-white py-6 px-6 text-center">
-        <h2 className="text-3xl font-black uppercase tracking-widest text-[#E6FFFF]">{category}</h2>
+        <h2 className="text-4xl font-light uppercase tracking-widest text-[#E6FFFF]">{category}</h2>
       </div>
       <div className="p-6 bg-white sm:p-10"> 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

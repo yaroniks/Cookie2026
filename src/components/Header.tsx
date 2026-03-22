@@ -50,15 +50,15 @@ const Header: React.FC = () => {
     <header className="bg-[#003289] h-16 flex items-center justify-between px-4 sm:px-6 shadow-md w-full gap-2 sm:gap-6 relative z-50">
       <div className="shrink-0">
         <Link to="/">
-          <span className="hidden sm:block text-2xl font-extrabold text-white tracking-wider">
+          <span className="hidden text-2xl font-extrabold tracking-wider text-white sm:block">
             SparkNews
           </span>
         </Link>
       </div>
 
-      <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-300" />
+      <form onSubmit={handleSearch} className="relative flex-1 max-w-2xl">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <Search className="w-4 h-4 text-gray-300 sm:h-5 sm:w-5" />
         </div>
         <input
           type="text"
@@ -69,28 +69,28 @@ const Header: React.FC = () => {
         />
       </form>
       
-      <div className="shrink-0 relative">
+      <div className="relative shrink-0">
         <button 
           onClick={() => setIsFilterOpen(!isFilterOpen)} 
-          className={`flex items-center justify-center bg-[#3366CC] hover:bg-blue-600 text-white p-2 sm:px-5 sm:py-2 rounded-lg transition-colors font-medium sm:space-x-2 ${isFilterOpen ? 'ring-2 ring-white' : ''}`}
+          className={`flex items-center cursor-pointer justify-center bg-[#3366CC] hover:bg-blue-600 text-white p-2 sm:px-5 sm:py-2 rounded-lg transition-colors font-medium sm:space-x-2 ${isFilterOpen ? 'ring-2 ring-white' : ''}`}
         >
-          <Filter className="h-5 w-5 sm:h-4 sm:w-4" />
+          <Filter className="w-5 h-5 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline">Фильтры</span>
           <ChevronDown className={`hidden sm:block h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {isFilterOpen && (
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center">
+          <div className="absolute right-0 w-56 py-2 mt-2 overflow-hidden duration-200 bg-white border border-gray-200 shadow-2xl rounded-xl animate-in fade-in zoom-in">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100">
               <span className="font-bold text-[#003289] text-sm uppercase">Категории</span>
               <button onClick={() => handleCategorySelect(null)} className="text-gray-400 hover:text-red-500">
-                <X className="h-4 w-4" />
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="max-h-64 overflow-y-auto">
+            <div className="overflow-y-auto max-h-64">
               <button
                 onClick={() => handleCategorySelect(null)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50 transition-colors text-gray-700"
+                className="w-full px-4 py-2 text-sm text-left text-gray-700 transition-colors hover:bg-blue-50"
               >
                 Все категории
               </button>
