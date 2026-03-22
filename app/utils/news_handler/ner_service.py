@@ -37,10 +37,10 @@ class NERService:
                 continue
             seen.add(key)
 
-            clear_text = text.replace('None', '')
+            clear_text = ent.text.strip().replace('None', '')
             if clear_text.replace(' ', ''):
                 entities.append({
-                    "text": ent.text.strip(),
+                    "text": clear_text,
                     "label": ent.label_,
                 })
 
