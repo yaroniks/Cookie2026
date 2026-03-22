@@ -8,7 +8,7 @@ router = APIRouter(prefix="/graph", tags=["graph"])
 
 
 @router.get("/co-occurrences", summary='Возвращает график CO_OCCURS_WITH между узлами Person/Organization.',
-            )# response_model=schemas.Occurrences
+            response_model=schemas.Occurrences)
 async def get_co_occurrences(
         min_weight: int = Query(default=1, ge=1, description="Minimum edge weight"),
         limit: int = Query(default=200, ge=1, le=1000, description="Max number of edges"),
@@ -33,23 +33,23 @@ async def get_co_occurrences(
     )
 
 
-@router.get("/mentioned-in")
-async def get_mentioned_in(
-        limit: int = Query(default=300, ge=1, le=2000, description="Max number of edges"),
-):
-    """
-    Returns the MENTIONED_IN graph between Articles and entities
-    (Person / Organization / Location).
-
-    Example response:
-    {
-        "nodes": [
-            {"id": "art::https://...", "label": "Article title", "type": "Article"},
-            {"id": "ent::Putin",       "label": "Putin",         "type": "Person"}
-        ],
-        "edges": [
-            {"source": "art::https://...", "target": "ent::Putin", "type": "MENTIONED_IN"}
-        ]
-    }
-    """
-    return await neo4j_service.get_mentioned_in_graph(limit=limit)
+# @router.get("/mentioned-in")
+# async def get_mentioned_in(
+#         limit: int = Query(default=300, ge=1, le=2000, description="Max number of edges"),
+# ):
+#     """
+#     Returns the MENTIONED_IN graph between Articles and entities
+#     (Person / Organization / Location).
+#
+#     Example response:
+#     {
+#         "nodes": [
+#             {"id": "art::https://...", "label": "Article title", "type": "Article"},
+#             {"id": "ent::Putin",       "label": "Putin",         "type": "Person"}
+#         ],
+#         "edges": [
+#             {"source": "art::https://...", "target": "ent::Putin", "type": "MENTIONED_IN"}
+#         ]
+#     }
+#     """
+#     return await neo4j_service.get_mentioned_in_graph(limit=limit)

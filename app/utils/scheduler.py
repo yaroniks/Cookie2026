@@ -12,7 +12,7 @@ async def fetch_and_process_job():
     """Запускается каждые 15 минут. Обычный async — никаких оберток."""
     logger.info("scheduler: запуск пайплайна")
     try:
-        from app.utils.news_handler.rss_parser import fetch_feeds_raw
+        from app.utils.parsers.rss import fetch_feeds_raw
         from app.utils.news_handler.news_processor import process_and_save
 
         async with aiohttp.ClientSession() as session:

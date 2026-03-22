@@ -48,3 +48,4 @@ app.state.limiter = limiter
 app.include_router(news_router)
 app.include_router(chat_router)
 app.include_router(graph_router)
+app.include_router(currencies_router)

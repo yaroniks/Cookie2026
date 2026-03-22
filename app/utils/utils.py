@@ -1,6 +1,6 @@
 from app.database.redis import redis_service
 from app.utils.ai_chat import MistralChat
-from app.utils.news_handler.rss_parser import fetch_feeds
+from app.utils.parsers.rss import fetch_feeds
 from app.utils.news_handler.ner_service import ner_service
 
 

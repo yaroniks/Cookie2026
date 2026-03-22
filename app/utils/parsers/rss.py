@@ -1,20 +1,3 @@
-"""
-rss_parser.py — парсер RSS-лент.
-
-Изменения по сравнению с оригиналом:
-  Добавлена функция fetch_feeds_raw(session) — то же самое что fetch_feeds,
-  но БЕЗ декоратора @redis_service.cache.
-
-  Зачем: декоратор @cache требует передачи session как аргумента
-  и кеширует результат в Redis. В Celery это работает, НО:
-  - кеш живёт 500 сек, и задача каждые 15 мин получит старые данные
-  - в Celery лучше явно управлять кешем через invalidate_rss_cache
-
-  Используй:
-    fetch_feeds(session)     — в FastAPI роутерах (с кешем, для /news/)
-    fetch_feeds_raw(session) — в Celery задачах (без кеша, всегда свежие)
-"""
-
 import config
 from app.database.redis import redis_service
 

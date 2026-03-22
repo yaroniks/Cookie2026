@@ -1,11 +1,9 @@
-from app.database.models import ArticleModel
 from app.utils.utils import get_main_new
 import app.schemas as schemas
 from app.limiter import limiter
-from app.utils.ai_chat import MistralChat
 from app.utils.news_handler.ner_service import ner_service
 from app.utils.news_handler.news_processor import get_articles_semantic
-from app.utils.news_handler.rss_parser import fetch_feeds
+from app.utils.parsers.rss import fetch_feeds
 
 from fastapi import APIRouter, Request
 
