@@ -4,7 +4,5 @@
 ```bash
 git clone https://github.com/yaroniks/Cookie2026.git -b frontend
 cd Cookie2026
-
-git pull origin main
 docker compose up --build -d
 ```
