@@ -50,6 +50,19 @@ Spark News — это интеллектуальная система, кото�
     - генерация ответов через Mistral
     - использование контекста из базы
 
+```mermaid
+flowchart RL
+     subgraph apscheduler
+       RSS["RSS"] --> process_and_save
+       
+       subgraph process_and_save
+           CLUSTER["embedding + HDBSCAN"] --> NER["NER"]
+           NER --> DB["PostgreSQL"]
+           NER --> NEO["Neo4j"]
+       end
+    end
+```
+
 > by yarovich
 
 ---
